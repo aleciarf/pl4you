@@ -13,8 +13,7 @@ Google Apps Script that stores club records and posters.
    same Apps Script project. Setup then reuses and moves its existing app
    database and poster folder. Archive the old web deployment after migration.
 3. In **Project Settings → Script properties**, add `API_SECRET` with a long
-   random value. Keep it for the Cloudflare setup. Use a separate value for
-   the club password below.
+   random value. Keep it for the Cloudflare setup.
 4. Run `setup_` from the Apps Script editor and authorize Google access.
    It creates or reuses the Sheets database and the poster folder inside
    the supplied Drive folder. The execution log shows both links.
@@ -33,16 +32,12 @@ npx wrangler login
 npx wrangler deploy
 npx wrangler secret put GOOGLE_SCRIPT_URL
 npx wrangler secret put API_SECRET
-npx wrangler secret put CLUB_PASSWORD
 ```
 
 - `GOOGLE_SCRIPT_URL` is the Apps Script `/exec` URL.
 - `API_SECRET` must match the Apps Script property exactly.
-- `CLUB_PASSWORD` is a separate, strong ASCII password to share with your group.
-
-Open the Worker URL printed by Wrangler. In the browser login prompt, enter
-`club` as the username and your club password. Then add or select your member
-name. Anyone with the club password can switch profiles and edit shared titles.
+Open the Worker URL printed by Wrangler, then add or select your member name.
+Any visitor can switch profiles and edit shared titles and watchlists.
 Files in the Drive folder follow that folder's Google sharing permissions.
 
 ## 3. Verify your deployment

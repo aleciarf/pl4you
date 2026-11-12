@@ -9,29 +9,6 @@ function fail(error, status) {
   return json({ok:false,error},status);
 }
 
-async function equal(left, right) {
-  const encode = new TextEncoder();
-  const [a,b] = await Promise.all([left,right].map(value =>
-    crypto.subtle.digest('SHA-256',encode.encode(value))));
-  const bytesA = new Uint8Array(a), bytesB = new Uint8Array(b);
-  let difference = 0;
-  for (let i = 0; i < bytesA.length; i++) difference |= bytesA[i] ^ bytesB[i];
-  return difference === 0;
-}
-
-async function allowed(request, password) {
-  const header = request.headers.get('Authorization') || '';
-  if (!header.startsWith('Basic ')) return false;
-  try {
-    const credentials = atob(header.slice(6));
-    const separator = credentials.indexOf(':');
-    return separator !== -1 && credentials.slice(0,separator) === 'club' &&
-      await equal(credentials.slice(separator+1), password);
-  } catch {
-    return false;
-  }
-}
-
 async function readJson(request) {
   const reader = request.body?.getReader();
   if (!reader) throw new SyntaxError('Missing JSON body.');
@@ -56,12 +33,6 @@ async function readJson(request) {
 
 export default {
   async fetch(request, env) {
-    if (!env.CLUB_PASSWORD) return new Response('Set the CLUB_PASSWORD Worker secret.',{status:503});
-    if (!await allowed(request,env.CLUB_PASSWORD)) {
-      return new Response('Enter the PL4YOU club credentials.',{status:401,headers:{
-        'WWW-Authenticate':'Basic realm="PL4YOU"', 'Cache-Control':'no-store'
-      }});
-    }
     const url = new URL(request.url);
     if (url.pathname !== '/api') {
       const asset = await env.ASSETS.fetch(request);
