@@ -1,0 +1,8 @@
+name = "pl4you"
+main = "worker.mjs"
+compatibility_date = "2026-11-11"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true

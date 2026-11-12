@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>PL4YOU</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+@font-face{font-family:"Night Circus";src:url("./fonts/night-circus.otf") format("opentype");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Movie Filmstrip";src:url("./fonts/movie-filmstrip.otf") format("opentype");font-weight:400;font-style:normal;font-display:swap}
+:root{--bg:#151318;--panel:#201c24;--line:#3a303d;--muted:#b8aab9;--pink:#ff8db0;--white:#fff4f8}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--white);font:15px 'DM Sans',sans-serif}button,input,select,textarea{font:inherit;color:inherit}button,select{cursor:pointer}button,.button{border:1px solid var(--line);border-radius:9px;padding:10px 15px;background:var(--panel);text-decoration:none;color:inherit;font-weight:700}button:hover,.button:hover{border-color:var(--pink)}button:disabled{opacity:.55;cursor:wait}.primary{background:var(--pink);border-color:var(--pink);color:#26101c}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px max(5vw,18px);border-bottom:1px solid var(--line);background:#19151c;position:sticky;top:0;z-index:2;flex-wrap:wrap}.brand{font:400 25px 'Night Circus','Playfair Display',Georgia,serif;white-space:nowrap}.brand span{color:var(--pink)}.brand-digit{font-family:"Movie Filmstrip","Night Circus",Georgia,serif}nav,.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}nav button{background:transparent;border-color:transparent;color:var(--muted)}nav button[aria-current=page]{background:#352432;color:var(--pink)}header select{max-width:160px}
+main{width:min(1180px,90%);margin:28px auto 60px}.kicker{text-transform:uppercase;letter-spacing:.16em;font-size:11px;font-weight:700;color:var(--pink)}h2,h3,p{margin:0 0 12px}h2{font-family:'Playfair Display',Georgia,serif}h2{font-size:28px}h3{font-size:18px}p{line-height:1.5}.muted,small{color:var(--muted)}
+.toolbar{display:flex;gap:10px;margin:0 0 28px}.toolbar input{flex:1}.toolbar select{max-width:45%}input,select,textarea{min-width:0;background:#17141a;border:1px solid var(--line);border-radius:8px;padding:10px 12px}textarea{width:100%;resize:vertical}section{margin:0 0 30px}.rail{display:grid;grid-auto-columns:clamp(135px,19vw,190px);grid-auto-flow:column;gap:14px;overflow-x:auto;padding:10px 3px 14px;scroll-snap-type:x proximity}.tile{padding:0;border:0;background:none;text-align:left;scroll-snap-align:start;min-width:0}.tile:hover .art{box-shadow:0 0 0 2px var(--pink)}.tile strong,.tile small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:6px}.art{aspect-ratio:2/3;display:grid;place-items:center;position:relative;overflow:hidden;border-radius:12px;background:radial-gradient(ellipse at 30% 15%,hsl(var(--hue) 45% 38%),transparent 75%),#241d2a;border:1px solid #ffffff20;text-align:center;padding:12px}.art span{font:600 clamp(17px,2.5vw,25px) 'Playfair Display',Georgia,serif;overflow-wrap:anywhere}.art img{position:absolute;width:100%;height:100%;inset:0;object-fit:cover}.empty{border:1px dashed var(--line);border-radius:15px;padding:30px;color:var(--muted);text-align:center}.empty h3{color:var(--white)}.demo{font-size:12px;color:var(--muted);text-align:center;margin:-10px 0 17px}
+dialog{background:var(--panel);color:var(--white);border:1px solid var(--line);border-radius:18px;width:min(650px,calc(100% - 24px));max-height:90vh;padding:22px}dialog::backdrop{background:#0c090ed0}.dialog-head{display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:15px}.close{padding:5px 11px;font-size:20px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}label,fieldset{display:grid;gap:6px;min-width:0;font-weight:600}.wide{grid-column:1/-1}fieldset{border:1px solid var(--line);border-radius:8px}.checks{display:flex;gap:10px;flex-wrap:wrap}.checks label{display:flex;align-items:center}.stars{display:flex;gap:4px}.stars button{font-size:24px;padding:2px 7px;color:var(--muted)}.stars button[aria-pressed=true]{color:#ffd378}.form-actions{margin-top:17px}.detail{display:grid;grid-template-columns:minmax(100px,180px) 1fr;gap:18px}.detail p{white-space:pre-wrap;overflow-wrap:anywhere}.detail .actions{margin-top:14px}.badge{padding:4px 8px;background:#392a3d;border-radius:6px;color:#f2c7df;display:inline-block;margin:0 4px 5px 0}.center{text-align:center}.deck{width:min(300px,85vw);margin:12px auto;touch-action:pan-y;user-select:none}.deck .art{aspect-ratio:4/5;cursor:grab}.deck img{pointer-events:none}.center .actions{justify-content:center}.list-row{border:1px solid var(--line);border-radius:11px;background:var(--panel);padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.list-row .title-link{background:none;border:0;text-align:left;padding:5px}.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.stat-card{padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}.bar{height:8px;border-radius:10px;background:#3b2f40;margin:4px 0 13px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pink)}#toast{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);background:#432b40;padding:10px 16px;border-radius:8px;z-index:10;width:max-content;max-width:92vw}#toast:empty{display:none}
+@media(max-width:620px){header{gap:8px}nav{order:3;width:100%}nav button{padding:8px 10px}header .actions{gap:5px}header .actions button,header select{font-size:13px;padding:7px}header select{max-width:104px}.stat-grid{grid-template-columns:1fr}.detail{grid-template-columns:1fr}.detail .art{max-width:140px}.fields{grid-template-columns:1fr}.list-row{align-items:flex-start;flex-direction:column}}
+
+.fresh-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.fresh-head h2{margin:0}
+.fresh-controls{display:flex;gap:6px}
+.fresh-controls button{padding:6px 12px}
+.fresh-rail{display:flex;align-items:center;gap:clamp(4px,1vw,12px);height:clamp(184px,38vw,410px);padding-block:14px}
+.fresh-panel{flex:1 1 0;min-width:0;height:91%;padding:0;border:0;border-radius:clamp(6px,1.2vw,18px);overflow:hidden;transition:flex-grow 680ms cubic-bezier(.22,.75,.26,1),height 680ms,transform 200ms ease}
+.fresh-panel[aria-pressed=true]{flex-grow:4;height:100%}
+.fresh-panel img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.tile{transition:transform 180ms ease}
+.tinder-stage{display:grid;grid-template-columns:clamp(40px,12vw,60px) minmax(0,300px) clamp(40px,12vw,60px);align-items:center;justify-content:center;gap:clamp(8px,3vw,24px);overflow:hidden;padding:12px 4px}
+.tinder-stage .deck{width:100%;margin:0;transform:translate(var(--drag-x,0px),var(--drag-y,0px)) rotate(var(--drag-angle,0deg));transition:transform 200ms ease;position:relative;z-index:1}
+.tinder-stage .deck.dragging{transition:none}
+.deck.dragging .art{cursor:grabbing}
+.tinder-choice{padding:0;width:100%;aspect-ratio:1;border-radius:50%;font-size:24px}
+.tinder-choice.pass{color:var(--pink)}
+.tinder-meta{margin-top:8px}
+.tinder-sound{font-size:13px}
+@media(hover:hover){.tile:hover,.fresh-panel:hover{transform:translateY(-7px)}}
+@media(prefers-reduced-motion:reduce){.tile,.fresh-panel,.tinder-stage .deck{transition:none}}
+
+.ui-icon{display:block;width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1)}
+nav .nav-icon{display:grid;justify-items:center;gap:5px;padding-block:7px;font:700 10px/1.2 'DM Sans',sans-serif;letter-spacing:.075em}
+nav .nav-icon[aria-current=page] .ui-icon{filter:brightness(0) saturate(100%) invert(75%) sepia(27%) saturate(891%) hue-rotate(292deg)}
+.search-field{position:relative;flex:1;min-width:0}
+.search-field .ui-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;opacity:.65;pointer-events:none}
+.toolbar .search-field input{width:100%;padding-left:35px}
+.tinder-choice{display:grid;place-items:center}
+.tinder-choice .ui-icon{width:44%;height:44%}
+.tinder-choice.primary .ui-icon{filter:brightness(0)}
+.member-stats{margin-bottom:20px}
+.member-stats h3{overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">PL<span><span class="brand-digit">4</span>YOU</span></div>
+<nav aria-label="Views"><button type="button" class="nav-icon" data-view="browse"><img class="ui-icon" src="./icons/home_3917743.svg" alt=""><span>HOME</span></button><button type="button" class="nav-icon" data-view="tinder"><img class="ui-icon" src="./icons/smiley-comment-alt_9291741.svg" alt=""><span>TINDERBOX</span></button><button type="button" class="nav-icon" data-view="list"><img class="ui-icon" src="./icons/following_3917798.svg" alt=""><span>TO WATCH</span></button><button type="button" data-view="stats">Stats</button></nav>
+<div class="actions"><select id="profile" aria-label="Active member"></select><button id="memberButton" type="button" aria-label="Add member">+ Member</button><button class="primary" id="newTitle" type="button">+ Title</button></div>
+</header>
+<main>
+<div id="mode" class="demo"></div>
+<div id="content" aria-live="polite">Loading PL4YOU…</div>
+</main>
+<dialog id="memberDialog"><form id="memberForm"><div class="dialog-head"><h2>Join the club</h2><button type="button" class="close" aria-label="Close">×</button></div><label>Your name<input name="name" required maxlength="60" autocomplete="off"></label><div class="actions form-actions"><button class="primary">Add member</button></div><p class="form-error" role="alert"></p></form></dialog>
+<dialog id="titleDialog">
+<form id="titleForm">
+<div class="dialog-head"><h2 id="formHeading">Add a title</h2><button type="button" class="close" aria-label="Close">×</button></div>
+<div class="fields">
+<label class="wide">Name <input name="name" required maxlength="160"></label>
+<label>Type <select name="type"><option value="">Choose type</option><option>Movie</option><option>Series</option><option>Documentary</option><option>Miniseries</option><option>Anime</option><option>Other</option></select></label>
+<label>Genres <input name="genre" list="genres" maxlength="250" placeholder="e.g. Romance, Comedy"><small>Separate genres with commas.</small></label>
+<label>IMDb rating / 10 <input name="imdb" type="number" min="0" max="10" step="0.1"></label>
+<label>Rotten Tomatoes % <input name="tomatoes" type="number" min="0" max="100" step="1"></label>
+<label>Trailer link <input name="trailer" type="url" maxlength="1000" placeholder="https://"></label>
+<label>Poster <input name="posterFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><small>JPG, PNG, WebP, or GIF. Up to 1 MB.</small></label>
+<fieldset class="wide"><legend>Personal rating</legend><div id="stars" class="stars"></div></fieldset>
+<label class="wide">Summary <textarea name="summary" rows="3" maxlength="4000"></textarea></label>
+<label class="wide">Opinion <textarea name="opinion" rows="3" maxlength="4000"></textarea></label>
+<label class="wide">Recommended by <select name="recommended"></select></label>
+<fieldset class="wide"><legend>Completed by</legend><div class="checks" id="completions"></div></fieldset>
+</div>
+<div class="actions form-actions"><button class="primary">Save title</button></div><p class="form-error" role="alert"></p>
+</form>
+</dialog>
+<dialog id="detailDialog"><div class="dialog-head"><h2 id="detailHeading"></h2><button type="button" class="close" aria-label="Close">×</button></div><div id="detailBody"></div></dialog>
+<datalist id="genres"></datalist>
+<div id="toast" role="status"></div>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const suggested = ['Action','Adventure','Animation','Comedy','Crime','Documentary','Drama','Fantasy','History','Horror','Mystery','Romance','Sci-Fi','Thriller'];
+const personalities = {
+  romance: 'Love is in the air', action: 'You’re in for a little action?',
+  horror: 'It’s me whom ghosts should be afraid of', comedy: 'Here for the punchline',
+  drama: 'It’s all about the plot twist', mystery: 'I knew it was them',
+  'sci-fi': 'Mentally on another planet', fantasy: 'My other ride is a dragon',
+  thriller: 'Just one more episode', adventure: 'Pack the snacks. We’re going in.',
+  documentary: 'Wait, that actually happened?', crime: 'I have a suspect list',
+  animation: 'Drawn to a good story', history: 'Born in the wrong century'
+};
+const cloud = location.protocol !== 'file:';
+const storage = {
+  get(key) { try { return localStorage.getItem(key); } catch (_) { return null; } },
+  set(key, value) { localStorage.setItem(key, value); }
+};
+const blank = () => ({members:[],titles:[],activity:[]});
+let state = blank(), active = storage.get('watchclub-member') || '', view = 'browse';
+let query = '', typeFilter = '', picked = '', editing = '', stars = '', detailId = '';
+let toastTimer, busy = false, loaded = false;
+const posters = new Map(), pendingPosters = new Map();
+let observer;
+
+function localCall(method, args) {
+  const db = JSON.parse(storage.get('watchclub-demo') || JSON.stringify(blank()));
+  function status(memberId, titleId, value) {
+    const id = memberId + ':' + titleId;
+    db.activity = db.activity.filter(entry => entry.id !== id);
+    if (value) db.activity.push({id, memberId, titleId, status:value});
+  }
+  let result = db;
+  if (method === 'getState') return db;
+  if (method === 'getPoster') return db.titles.find(t => t.id === args[0])?.poster || '';
+  if (method === 'addMember') {
+    const name = args[0].trim();
+    let member = db.members.find(item => item.name.toLowerCase() === name.toLowerCase());
+    if (!member) { member = {id:crypto.randomUUID(),name}; db.members.push(member); }
+    result = {id:member.id,state:db};
+  }
+  if (method === 'saveTitle') {
+    const {completed, posterData, ...title} = args[0];
+    const old = db.titles.find(t => t.id === title.id);
+    title.id ||= crypto.randomUUID();
+    title.poster = posterData || old?.poster || '';
+    if (old) db.titles[db.titles.indexOf(old)] = title;
+    else db.titles.push(title);
+    completed.forEach(id => status(id,title.id,'watched'));
+  }
+  if (method === 'setStatus') status(...args);
+  storage.set('watchclub-demo',JSON.stringify(db));
+  return result;
+}
+function call(method, ...args) {
+  if (!cloud) return Promise.resolve().then(() => localCall(method,args));
+  return fetch('/api', {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({method,args})
+  }).then(async response => {
+    const result = await response.json();
+    if (!response.ok || !result.ok) throw new Error(result.error || 'The server could not complete this request.');
+    return result.data;
+  });
+}
+function toast(message) {
+  $('toast').textContent = message;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { $('toast').textContent = ''; },4200);
+}
+function memberName(id) { return state.members.find(m => m.id === id)?.name || ''; }
+function genreList(title) {
+  const values = new Map();
+  for (const part of title.genre.split(',')) {
+    const label = part.trim();
+    if (!label) continue;
+    const key = label.toLowerCase();
+    values.set(key,suggested.find(g => g.toLowerCase() === key) || label);
+  }
+  return [...values.values()];
+}
+function statusOf(id, person = active) {
+  return state.activity.find(entry => entry.titleId === id && entry.memberId === person)?.status || '';
+}
+function setActive(id) {
+  active = id;
+  picked = '';
+  try { storage.set('watchclub-member',id); } catch (_) {}
+}
+function refreshProfile() {
+  if (active && !memberName(active)) setActive('');
+  $('profile').innerHTML = '<option value="">Choose member</option>' + state.members.map(m =>
+    '<option value="' + esc(m.id) + '">' + esc(m.name) + '</option>').join('');
+  $('profile').value = active;
+  const options = new Map(suggested.map(g => [g.toLowerCase(),g]));
+  state.titles.flatMap(genreList).forEach(g => options.set(g.toLowerCase(),g));
+  $('genres').innerHTML = [...options.values()].sort().map(g => '<option value="' + esc(g) + '">').join('');
+}
+function art(title) {
+  const hue = Array.from(title.name).reduce((n,c) => (n * 31 + c.codePointAt(0)) % 360,12);
+  return '<div class="art" style="--hue:' + hue + '"><span>' + esc(title.name) + '</span>' +
+    (title.poster ? '<img hidden data-poster="' + esc(title.id) + '" alt="">' : '') + '</div>';
+}
+function attachPosters(root) {
+  observer ||= new IntersectionObserver(entries => entries.forEach(({target,isIntersecting}) => {
+    if (!isIntersecting) return;
+    observer.unobserve(target);
+    const id = target.dataset.poster;
+    const title = state.titles.find(t => t.id === id);
+    if (!title?.poster) return;
+    const key = cloud ? title.poster : id;
+    if (!posters.has(key) && !pendingPosters.has(key)) {
+      const request = call('getPoster',id).then(src => {
+        if (src) posters.set(key,src);
+        return src;
+      }).finally(() => pendingPosters.delete(key));
+      pendingPosters.set(key,request);
+    }
+    Promise.resolve(posters.get(key) || pendingPosters.get(key)).then(src => {
+      if (src && target.isConnected) { target.src = src; target.hidden = false; }
+    }).catch(() => {});
+  }),{rootMargin:'120px'});
+  root.querySelectorAll('img[data-poster]').forEach(img => {
+    // Hidden images have no layout box. Observe the artwork until it is visible.
+    img.hidden = false;
+    img.style.visibility = 'hidden';
+    img.addEventListener('load', () => { img.style.visibility = ''; }, {once:true});
+    observer.observe(img);
+  });
+}
+function action(label, attr, value, primary = false) {
+  return '<button' + (primary ? ' class="primary"' : '') + ' data-' + attr + '="' + esc(value) + '">' + esc(label) + '</button>';
+}
+function empty(title, message, button = '') {
+  return '<div class="empty"><h3>' + esc(title) + '</h3><p>' + esc(message) + '</p>' + button + '</div>';
+}
+function titleTile(t) {
+  return '<button class="tile" data-title="' + esc(t.id) + '">' + art(t) + '<strong>' + esc(t.name) +
+    '</strong><small>' + esc([t.type,t.imdb !== '' && 'IMDb ' + t.imdb].filter(Boolean).join(' · ')) + '</small></button>';
+}
+function renderCatalog() {
+  const groups = new Map();
+  state.titles.filter(t => (!typeFilter || t.type === typeFilter) &&
+    (t.name + ' ' + t.genre).toLowerCase().includes(query.toLowerCase())).reverse().forEach(t => {
+    const genres = genreList(t);
+    (genres.length ? genres : ['Uncategorized']).forEach(genre => {
+      const key = genre.toLowerCase();
+      if (!groups.has(key)) groups.set(key,{genre,titles:[]});
+      groups.get(key).titles.push(t);
+    });
+  });
+  const sections = [...groups.values()].sort((a,b) => a.genre.localeCompare(b.genre)).map(group =>
+    '<section><h2>' + esc(group.genre) + '</h2><div class="rail">' + group.titles.map(titleTile).join('') + '</div></section>');
+  $('catalog').innerHTML = sections.join('') || (state.titles.length ?
+    empty('No matching titles','Try a different search or type.') :
+    empty('Start your collection','Add a movie or series to build your club’s catalog.',action('Add a title','add','yes',true)));
+  attachPosters($('catalog'));
+}
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+let freshTimer;
+let freshTitleId = '';
+
+function renderFreshPicks() {
+  const titles = state.titles.filter(title => title.poster).slice(-5).reverse();
+  if (!titles.length) return '';
+  if (!titles.some(title => title.id === freshTitleId)) freshTitleId = titles[0].id;
+  const leftCount = Math.floor((titles.length - 1) / 2);
+  if (leftCount) titles.unshift(...titles.splice(-leftCount));
+  return '<section aria-labelledby="fresh-heading"><div class="fresh-head"><h2 id="fresh-heading">Fresh Picks</h2>' +
+    (titles.length > 1 ? '<div class="fresh-controls">' +
+      '<button type="button" id="fresh-prev" aria-label="Previous poster">←</button>' +
+      '<button type="button" id="fresh-next" aria-label="Next poster">→</button></div>' : '') +
+    '</div><div id="fresh-rail" class="fresh-rail" role="group" aria-label="Recent posters">' +
+    titles.map(title => '<button type="button" class="fresh-panel" aria-pressed="' + (title.id === freshTitleId) +
+      '" aria-label="' + esc(title.name) + ' poster"><img data-poster="' + esc(title.id) +
+      '" alt=""></button>').join('') + '</div></section>';
+}
+
+function wireFreshPicks() {
+  const rail = $('fresh-rail');
+  if (!rail) return;
+  attachPosters(rail);
+  const panels = [...rail.children];
+  if (panels.length < 2) return;
+  let index = panels.findIndex(panel => panel.firstElementChild.dataset.poster === freshTitleId);
+
+  function select(next) {
+    panels[index].setAttribute('aria-pressed','false');
+    index = (next + panels.length) % panels.length;
+    panels[index].setAttribute('aria-pressed','true');
+    freshTitleId = panels[index].firstElementChild.dataset.poster;
+  }
+  function schedule() {
+    clearInterval(freshTimer);
+    if (reducedMotion.matches) return;
+    freshTimer = setInterval(() => {
+      if (!document.hidden && !rail.contains(document.activeElement) && !document.querySelector('dialog[open]')) {
+        select(index + 1);
+      }
+    },5000);
+  }
+  $('fresh-prev').addEventListener('click', () => { select(index - 1); schedule(); });
+  $('fresh-next').addEventListener('click', () => { select(index + 1); schedule(); });
+  panels.forEach((panel,i) => panel.addEventListener('click', () => { select(i); schedule(); }));
+  schedule();
+}
+function renderBrowse() {
+  const types = [...new Set(state.titles.map(t => t.type).filter(Boolean))].sort();
+  return renderFreshPicks() +
+    '<div class="toolbar"><div class="search-field"><img class="ui-icon" src="./icons/check_3917749.svg" alt=""><input id="search" type="search" aria-label="Search titles or genres" placeholder="Search titles or genres" value="' + esc(query) + '"></div>' +
+    '<select id="filter" aria-label="Filter by type"><option value="">All types</option>' +
+    types.map(t => '<option' + (t === typeFilter ? ' selected' : '') + '>' + esc(t) + '</option>').join('') + '</select></div><div id="catalog"></div>';
+}
+function requireProfile() {
+  return empty('Choose a member','Select your name at the top or add yourself to get started.',action('+ Add member','member','yes',true));
+}
+function renderTinder() {
+  if (!active) return requireProfile();
+  const pool = state.titles.filter(t => !statusOf(t.id));
+  if (!pool.length) return empty('You’re all caught up','New titles will appear here when someone adds them to the catalog.',action('Browse titles','view','browse'));
+  if (!pool.some(t => t.id === picked)) picked = pool[Math.floor(Math.random() * pool.length)].id;
+  const title = pool.find(t => t.id === picked);
+  return '<div class="center"><h2>Tinderbox</h2><p class="muted">Drag left to pass or right to save for later.</p>' +
+    '<div class="tinder-stage"><button type="button" class="tinder-choice pass" data-status="passed" aria-label="Pass"><img class="ui-icon" src="./icons/cross_3917759.svg" alt=""></button>' +
+    '<div class="deck" id="deck">' + art(title) + '</div>' +
+    '<button type="button" class="tinder-choice primary" data-status="queued" aria-label="Add to To Watch"><img class="ui-icon" src="./icons/eye_3917752.svg" alt=""></button></div>' +
+    '<div class="tinder-meta"><h3>' + esc(title.name) + '</h3><p class="muted">' +
+    esc([title.type,...genreList(title)].filter(Boolean).join(' · ')) + '</p><div class="actions">' +
+    action('Watched','status','watched') + '</div><div class="actions form-actions"><button type="button" class="tinder-sound" id="tinder-sound" aria-pressed="' +
+    soundEnabled + '">Flip sound ' + (soundEnabled ? 'on' : 'off') + '</button></div></div></div>';
+}
+function renderList() {
+  if (!active) return requireProfile();
+  return '<h2>' + esc(memberName(active)) + '’s list</h2>' +
+    [['queued','To Watch'],['watched','Watched'],['passed','Passed']].map(([status,heading]) => {
+      const titles = state.titles.filter(t => statusOf(t.id) === status);
+      const rows = titles.map(t => '<div class="list-row"><button class="title-link" data-title="' + esc(t.id) + '">' +
+        esc(t.name) + '</button><div class="actions">' +
+        (status === 'queued' ? action('✓ Watched','change',t.id + ':watched',true) : '') +
+        action(status === 'watched' ? 'Undo watched' : status === 'passed' ? 'Show in Tinderbox again' : 'Remove','change',t.id + ':') +
+        '</div></div>').join('');
+      return '<section><h3>' + heading + ' · ' + titles.length + '</h3>' + (rows || empty('Nothing here yet','')) + '</section>';
+    }).join('');
+}
+function renderStats() {
+  if (!state.members.length) return empty('No members yet','Add a member to start tracking what everyone watches.',action('+ Add member','member','yes',true));
+  return state.members.map(renderMemberStats).join('');
+}
+function renderMemberStats(member) {
+  const titles = state.titles.filter(t => statusOf(t.id,member.id) === 'watched');
+  const queued = state.titles.filter(t => statusOf(t.id,member.id) === 'queued').length;
+  const heading = '<section class="member-stats"><h2>' + esc(member.name) + '</h2>';
+  const totals = '<p>' + titles.length + ' watched · ' + queued + ' to watch</p>';
+  if (!titles.length) {
+    return heading + '<div class="stat-card">' + totals + '<p class="muted">No watched titles yet.</p></div></section>';
+  }
+  const counts = new Map();
+  titles.forEach(t => genreList(t).forEach(g => {
+    const key = g.toLowerCase();
+    counts.set(key,{label:g,count:(counts.get(key)?.count || 0) + 1});
+  }));
+  const ranks = [...counts.values()].sort((a,b) => b.count-a.count || a.label.localeCompare(b.label));
+  const top = ranks[0];
+  const tied = ranks.filter(g => g.count === top?.count);
+  const personality = top ? personalities[top.label.toLowerCase()] || top.label + ' loyalist' : 'The genre explorer';
+  return heading + '<div class="stat-grid"><div class="stat-card"><div class="kicker">Watch personality</div><h3>' +
+    esc(personality) + '</h3>' + totals + (top ? '<p class="muted">Top ' + (tied.length > 1 ? 'genres · ' : 'genre · ') +
+    esc(tied.map(g => g.label).join(', ')) + '</p>' : '') + '</div><div class="stat-card"><h3>Watched by genre</h3>' +
+    (ranks.map(g => '<div>' + esc(g.label) + ' · ' + g.count + '</div><div class="bar"><i style="width:' +
+      (100*g.count/titles.length) + '%"></i></div>').join('') || '<p class="muted">No genres recorded for watched titles.</p>') +
+    '</div></div></section>';
+}
+let soundEnabled = storage.get('pl4you-flip-sound') !== 'off';
+let flipAudio;
+
+function playFlipSound() {
+  if (!soundEnabled) return;
+  try {
+    const Audio = window.AudioContext || window.webkitAudioContext;
+    if (!Audio) return;
+    flipAudio ||= new Audio();
+    if (flipAudio.state === 'suspended') flipAudio.resume().catch(() => {});
+    const duration = 0.19;
+    const buffer = flipAudio.createBuffer(1,Math.ceil(flipAudio.sampleRate * duration),flipAudio.sampleRate);
+    const samples = buffer.getChannelData(0);
+    for (let i = 0; i < samples.length; i++) samples[i] = Math.random() * 2 - 1;
+    const source = flipAudio.createBufferSource();
+    const filter = flipAudio.createBiquadFilter();
+    const gain = flipAudio.createGain();
+    const now = flipAudio.currentTime;
+    source.buffer = buffer;
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(2100,now);
+    filter.frequency.exponentialRampToValueAtTime(520,now + duration);
+    gain.gain.setValueAtTime(.001,now);
+    gain.gain.linearRampToValueAtTime(.16,now + .035);
+    gain.gain.exponentialRampToValueAtTime(.001,now + duration);
+    source.connect(filter).connect(gain).connect(flipAudio.destination);
+    source.start(now);
+  } catch (_) {
+    // The card still works if browser audio is unavailable.
+  }
+}
+
+function wireSwipe() {
+  const deck = $('deck');
+  if (!deck) return;
+  const soundButton = $('tinder-sound');
+  soundButton.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    try { storage.set('pl4you-flip-sound',soundEnabled ? 'on' : 'off'); } catch (_) {}
+    soundButton.setAttribute('aria-pressed',String(soundEnabled));
+    soundButton.textContent = 'Flip sound ' + (soundEnabled ? 'on' : 'off');
+  });
+  let start;
+  function reset() {
+    start = null;
+    deck.classList.remove('dragging');
+    for (const prop of ['--drag-x','--drag-y','--drag-angle']) deck.style.removeProperty(prop);
+  }
+  deck.addEventListener('pointerdown', event => {
+    if (busy || !event.isPrimary || event.button !== 0) return;
+    start = {id:event.pointerId,x:event.clientX,y:event.clientY};
+    deck.classList.add('dragging');
+    deck.setPointerCapture(event.pointerId);
+  });
+  deck.addEventListener('pointermove', event => {
+    if (start?.id !== event.pointerId || reducedMotion.matches) return;
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+    deck.style.setProperty('--drag-x',dx + 'px');
+    deck.style.setProperty('--drag-y',Math.max(-36,Math.min(36,dy * .3)) + 'px');
+    deck.style.setProperty('--drag-angle',Math.max(-18,Math.min(18,dx / 9)) + 'deg');
+  });
+  deck.addEventListener('pointercancel',reset);
+  deck.addEventListener('lostpointercapture',() => { if (start) reset(); });
+  deck.addEventListener('pointerup', event => {
+    if (start?.id !== event.pointerId) return;
+    const dx = event.clientX - start.x, dy = event.clientY - start.y;
+    if (!busy && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+      start = null;
+      deck.classList.remove('dragging');
+      changeStatus(picked,dx > 0 ? 'queued' : 'passed',deck);
+    } else reset();
+  });
+}
+
+function flipCard(deck,status) {
+  playFlipSound();
+  if (reducedMotion.matches || !deck.animate) return Promise.resolve();
+  const direction = status === 'passed' ? -1 : 1;
+  const finish = status === 'watched' ? 'perspective(650px) rotateY(85deg) scale(.92)' :
+    'translateX(' + (direction * (deck.offsetWidth + 90)) + 'px) rotate(' + (direction * 24) + 'deg)';
+  const animation = deck.animate([
+    {transform:getComputedStyle(deck).transform,opacity:1},
+    {transform:finish,opacity:0}
+  ],{duration:260,easing:'ease-in',fill:'forwards'});
+  return animation.finished.catch(() => {}).then(() => animation);
+}
+
+function render() {
+  if (!loaded) return;
+  refreshProfile();
+  document.querySelectorAll('nav [data-view]').forEach(btn => {
+    if (btn.dataset.view === view) btn.setAttribute('aria-current','page');
+    else btn.removeAttribute('aria-current');
+  });
+  clearInterval(freshTimer);
+  $('content').innerHTML = ({browse:renderBrowse,tinder:renderTinder,list:renderList,stats:renderStats})[view]();
+  if (view === 'browse') {
+    wireFreshPicks();
+    $('search').addEventListener('input',event => { query = event.target.value; renderCatalog(); });
+    $('filter').addEventListener('change',event => { typeFilter = event.target.value; renderCatalog(); });
+    renderCatalog();
+  } else {
+    attachPosters($('content'));
+    if (view === 'tinder') wireSwipe();
+  }
+}
+function renderStars() {
+  $('stars').innerHTML = Array.from({length:5},(_,i) => '<button type="button" data-star="' + (i+1) +
+    '" aria-label="' + (i+1) + ' stars" aria-pressed="' + (Number(stars) >= i+1) + '">' +
+    (Number(stars) >= i+1 ? '★' : '☆') + '</button>').join('') +
+    '<button type="button" data-star="" aria-label="Clear rating">×</button>';
+}
+function openTitleForm(title) {
+  if (!loaded) return;
+  const form = $('titleForm');
+  form.reset();
+  form.querySelector('.form-error').textContent = '';
+  editing = title?.id || '';
+  stars = title?.stars || '';
+  $('formHeading').textContent = title ? 'Edit title' : 'Add a title';
+  form.elements.recommended.innerHTML = '<option value="">Choose member</option>' +
+    state.members.map(m => '<option value="' + esc(m.id) + '">' + esc(m.name) + '</option>').join('');
+  for (const key of ['name','type','genre','imdb','tomatoes','trailer','summary','opinion','recommended']) {
+    form.elements[key].value = title?.[key] ?? (key === 'recommended' ? active : '');
+  }
+  $('completions').innerHTML = state.members.map(m => {
+    const watched = title && statusOf(title.id,m.id) === 'watched';
+    return '<label><input type="checkbox" name="completed" value="' + esc(m.id) + '"' +
+      (watched ? ' checked disabled' : '') + '>' + esc(m.name) + '</label>';
+  }).join('') || '<small>Add a member to record completions.</small>';
+  renderStars();
+  $('titleDialog').showModal();
+}
+function openMember() {
+  if (!loaded) return;
+  $('memberForm').reset();
+  $('memberForm').querySelector('.form-error').textContent = '';
+  $('memberDialog').showModal();
+}
+function safeTrailer(value) {
+  try { const url = new URL(value); return ['https:','http:'].includes(url.protocol) ? url.href : ''; }
+  catch (_) { return ''; }
+}
+function showDetail(id) {
+  const t = state.titles.find(title => title.id === id);
+  if (!t) return;
+  detailId = id;
+  const done = state.members.filter(m => statusOf(id,m.id) === 'watched').map(m => m.name);
+  const badges = [t.type,...genreList(t),t.imdb !== '' && 'IMDb ' + t.imdb + '/10',
+    t.tomatoes !== '' && 'Rotten Tomatoes ' + t.tomatoes + '%',t.stars && '★'.repeat(Number(t.stars)) + ' ' + t.stars + '/5'].filter(Boolean);
+  const trailer = safeTrailer(t.trailer);
+  const status = statusOf(id);
+  $('detailHeading').textContent = t.name;
+  $('detailBody').innerHTML = '<div class="detail">' + art(t) + '<div>' +
+    badges.map(b => '<span class="badge">' + esc(b) + '</span>').join('') +
+    (t.summary ? '<h3>Summary</h3><p>' + esc(t.summary) + '</p>' : '') +
+    (t.opinion ? '<h3>Opinion</h3><p>' + esc(t.opinion) + '</p>' : '') +
+    (memberName(t.recommended) ? '<p>Recommended by ' + esc(memberName(t.recommended)) + '</p>' : '') +
+    '<p class="muted">Completed by ' + esc(done.length ? done.join(', ') : 'no one yet') + '</p><div class="actions">' +
+    (trailer ? '<a class="button" href="' + esc(trailer) + '" target="_blank" rel="noopener noreferrer">Trailer ↗</a>' : '') +
+    (active && status !== 'watched' ? action(status === 'queued' ? 'Remove from To Watch' : '+ To Watch','change',id + ':' + (status === 'queued' ? '' : 'queued')) + action('✓ Watched','change',id + ':watched',true) : '') +
+    (active && status === 'watched' ? action('Undo watched','change',id + ':') : '') +
+    action('Edit','edit',id) + '</div></div></div>';
+  if (!$('detailDialog').open) $('detailDialog').showModal();
+  attachPosters($('detailBody'));
+}
+async function changeStatus(id,status,deck) {
+  if (!active || !id || busy) return;
+  busy = true;
+  const member = active;
+  let flip;
+  try {
+    flip = deck ? flipCard(deck,status) : Promise.resolve();
+    const [nextState] = await Promise.all([call('setStatus',member,id,status),flip]);
+    state = nextState;
+    picked = '';
+    render();
+    if ($('detailDialog').open) showDetail(detailId);
+    toast(({queued:'Added to To Watch',watched:'Marked as watched',passed:'Passed'})[status] || 'List updated');
+  } catch (error) {
+    (await flip)?.cancel();
+    if (deck) {
+      for (const prop of ['--drag-x','--drag-y','--drag-angle']) deck.style.removeProperty(prop);
+    }
+    toast(error.message || 'Unable to update your list.');
+  }
+  finally { busy = false; }
+}
+function submit(form, save) {
+  form.addEventListener('submit',async event => {
+    event.preventDefault();
+    if (busy) return;
+    busy = true;
+    const button = form.querySelector('button:not([type])');
+    const errorBox = form.querySelector('.form-error');
+    button.disabled = true;
+    errorBox.textContent = '';
+    try { await save(new FormData(form)); form.closest('dialog').close(); render(); }
+    catch (error) { errorBox.textContent = error.message || 'Unable to save. Please try again.'; }
+    finally { busy = false; button.disabled = false; }
+  });
+}
+function readImage(file) {
+  if (!file?.size) return Promise.resolve('');
+  if (file.size > 1048576 || !/^image\/(jpeg|png|webp|gif)$/.test(file.type)) {
+    return Promise.reject(new Error('Use a JPG, PNG, WebP, or GIF under 1 MB.'));
+  }
+  return new Promise((resolve,reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('The poster could not be read.'));
+    reader.readAsDataURL(file);
+  });
+}
+submit($('titleForm'), async fields => {
+  const title = Object.fromEntries(fields);
+  title.name = title.name.trim();
+  if (!title.name) throw new Error('Enter a title name.');
+  if (title.trailer && !safeTrailer(title.trailer)) throw new Error('Use an HTTP or HTTPS trailer link.');
+  title.completed = fields.getAll('completed');
+  title.posterData = await readImage(title.posterFile);
+  delete title.posterFile;
+  title.id = editing;
+  title.stars = stars;
+  state = await call('saveTitle',title);
+  if (editing && title.posterData && !cloud) posters.delete(editing);
+  toast(editing ? 'Title updated' : 'Title added');
+});
+submit($('memberForm'), async fields => {
+  const name = fields.get('name').trim();
+  if (!name) throw new Error('Enter a name.');
+  const result = await call('addMember',name);
+  state = result.state;
+  setActive(result.id);
+  toast('Switched to ' + name);
+});
+document.addEventListener('click',event => {
+  const button = event.target.closest('button');
+  if (!button) return;
+  const d = button.dataset;
+  if (button.classList.contains('close')) button.closest('dialog').close();
+  if (d.view) { view = d.view; render(); window.scrollTo(0,0); }
+  if (d.member || button.id === 'memberButton') openMember();
+  if (d.add || button.id === 'newTitle') openTitleForm();
+  if (d.title) showDetail(d.title);
+  if (d.edit) {
+    $('detailDialog').close();
+    openTitleForm(state.titles.find(t => t.id === d.edit));
+  }
+  if (d.star !== undefined) { stars = d.star; renderStars(); }
+  if (d.status) changeStatus(picked,d.status,$('deck'));
+  if (d.change) changeStatus(...d.change.split(':'));
+});
+$('profile').addEventListener('change',event => { setActive(event.target.value); render(); });
+async function load() {
+  try {
+    state = await call('getState');
+    loaded = true;
+    $('mode').textContent = cloud ? '' : 'Local preview · Changes stay in this browser';
+    render();
+  } catch (error) {
+    $('content').innerHTML = empty('PL4YOU couldn’t load',error.message || 'Try reloading the page.');
+  }
+}
+load();
+window.addEventListener('focus',async () => {
+  if (!cloud || !loaded || busy || document.querySelector('dialog[open]')) return;
+  busy = true;
+  try { state = await call('getState'); render(); }
+  catch (_) {}
+  finally { busy = false; }
+});
+</script>
+</body>
+</html>
