@@ -36,7 +36,7 @@ function sameSecret_(expected, received) {
 }
 
 // Run from the Apps Script editor as the owner.
-function setup_() {
+function setupPL4YOU() {
   return locked_(() => {
     const props = PropertiesService.getScriptProperties();
     const root = DriveApp.getFolderById(ROOT_FOLDER_ID);
@@ -87,7 +87,7 @@ function locked_(work) {
 
 function database_() {
   const id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
-  if (!id) throw new Error('The owner needs to run setup_ in Apps Script.');
+  if (!id) throw new Error('The owner needs to run setupPL4YOU in Apps Script.');
   return SpreadsheetApp.openById(id);
 }
 

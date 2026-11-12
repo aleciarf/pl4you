@@ -14,7 +14,7 @@ Google Apps Script that stores club records and posters.
    database and poster folder. Archive the old web deployment after migration.
 3. In **Project Settings → Script properties**, add `API_SECRET` with a long
    random value. Keep it for the Cloudflare setup.
-4. Run `setup_` from the Apps Script editor and authorize Google access.
+4. Run `setupPL4YOU` from the Apps Script editor and authorize Google access.
    It creates or reuses the Sheets database and the poster folder inside
    the supplied Drive folder. The execution log shows both links.
 5. Choose **Deploy → New deployment → Web app**. Set **Execute as** to **Me**
