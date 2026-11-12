@@ -294,7 +294,7 @@ function wireFreshPicks() {
 function renderBrowse() {
   const types = [...new Set(state.titles.map(t => t.type).filter(Boolean))].sort();
   return renderFreshPicks() +
-    '<div class="toolbar"><div class="search-field"><img class="ui-icon" src="./icons/check_3917749.svg" alt=""><input id="search" type="search" aria-label="Search titles or genres" placeholder="Search titles or genres" value="' + esc(query) + '"></div>' +
+    '<div class="toolbar"><div class="search-field"><img class="ui-icon" src="./icons/eye_3917752.svg" alt=""><input id="search" type="search" aria-label="Search titles or genres" placeholder="Search titles or genres" value="' + esc(query) + '"></div>' +
     '<select id="filter" aria-label="Filter by type"><option value="">All types</option>' +
     types.map(t => '<option' + (t === typeFilter ? ' selected' : '') + '>' + esc(t) + '</option>').join('') + '</select></div><div id="catalog"></div>';
 }
@@ -310,7 +310,7 @@ function renderTinder() {
   return '<div class="center"><h2>Tinderbox</h2><p class="muted">Drag left to pass or right to save for later.</p>' +
     '<div class="tinder-stage"><button type="button" class="tinder-choice pass" data-status="passed" aria-label="Pass"><img class="ui-icon" src="./icons/cross_3917759.svg" alt=""></button>' +
     '<div class="deck" id="deck">' + art(title) + '</div>' +
-    '<button type="button" class="tinder-choice primary" data-status="queued" aria-label="Add to To Watch"><img class="ui-icon" src="./icons/eye_3917752.svg" alt=""></button></div>' +
+    '<button type="button" class="tinder-choice primary" data-status="queued" aria-label="Add to To Watch"><img class="ui-icon" src="./icons/check_3917749.svg" alt=""></button></div>' +
     '<div class="tinder-meta"><h3>' + esc(title.name) + '</h3><p class="muted">' +
     esc([title.type,...genreList(title)].filter(Boolean).join(' · ')) + '</p><div class="actions">' +
     action('Watched','status','watched') + '</div><div class="actions form-actions"><button type="button" class="tinder-sound" id="tinder-sound" aria-pressed="' +
