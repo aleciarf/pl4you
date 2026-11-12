@@ -26,6 +26,21 @@ dialog{background:var(--panel);color:var(--white);border:1px solid var(--line);b
 .fresh-panel{flex:1 1 0;min-width:0;height:91%;padding:0;border:0;border-radius:clamp(6px,1.2vw,18px);overflow:hidden;transition:flex-grow 680ms cubic-bezier(.22,.75,.26,1),height 680ms,transform 200ms ease}
 .fresh-panel[aria-pressed=true]{flex-grow:4;height:100%}
 .fresh-panel img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.fresh-panel[aria-pressed=true]{display:flex;align-items:center;gap:clamp(8px,2vw,24px);padding:clamp(8px,1.5vw,18px);text-align:left}
+.fresh-panel[aria-pressed=true] img{flex:0 0 44%;width:44%;min-width:0;object-fit:contain;object-position:left center}
+.fresh-details{display:none}
+.fresh-panel[aria-pressed=true] .fresh-details{display:grid;align-content:center;gap:6px;flex:1;min-width:0;overflow:hidden;overflow-wrap:anywhere}
+.fresh-title{font:700 clamp(15px,2.6vw,32px)/1.12 'Playfair Display',Georgia,serif}
+.fresh-meta,.fresh-summary{font:400 clamp(11px,1.3vw,15px)/1.4 'DM Sans',sans-serif}
+.fresh-summary{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:5;overflow:hidden}
+@media(max-width:640px){
+  .fresh-rail{height:clamp(288px,75vw,390px)}
+  .fresh-panel[aria-pressed=true]{flex:0 0 72%;flex-direction:column;align-items:stretch}
+  .fresh-panel[aria-pressed=true] img{flex:0 0 auto;width:100%;height:49%}
+  .fresh-panel[aria-pressed=true] .fresh-details{align-content:start}
+  .fresh-summary{-webkit-line-clamp:3}
+}
+
 .tile{transition:transform 180ms ease}
 .tinder-stage{display:grid;grid-template-columns:clamp(40px,12vw,60px) minmax(0,300px) clamp(40px,12vw,60px);align-items:center;justify-content:center;gap:clamp(8px,3vw,24px);overflow:hidden;padding:12px 4px}
 .tinder-stage .deck{width:100%;margin:0;transform:translate(var(--drag-x,0px),var(--drag-y,0px)) rotate(var(--drag-angle,0deg));transition:transform 200ms ease;position:relative;z-index:1}
@@ -258,9 +273,18 @@ function renderFreshPicks() {
       '<button type="button" id="fresh-prev" aria-label="Previous poster">←</button>' +
       '<button type="button" id="fresh-next" aria-label="Next poster">→</button></div>' : '') +
     '</div><div id="fresh-rail" class="fresh-rail" role="group" aria-label="Recent posters">' +
-    titles.map(title => '<button type="button" class="fresh-panel" aria-pressed="' + (title.id === freshTitleId) +
-      '" aria-label="' + esc(title.name) + ' poster"><img data-poster="' + esc(title.id) +
-      '" alt=""></button>').join('') + '</div></section>';
+    titles.map(renderFreshPanel).join('') + '</div></section>';
+}
+function renderFreshPanel(title) {
+  const recommender = memberName(title.recommended);
+  const genres = genreList(title).join(' · ');
+  return '<button type="button" class="fresh-panel" aria-pressed="' + (title.id === freshTitleId) +
+    '" aria-label="' + esc(title.name) + '"><img data-poster="' + esc(title.id) + '" alt="">' +
+    '<span class="fresh-details"><strong class="fresh-title">' + esc(title.name) + '</strong>' +
+    (recommender ? '<span class="fresh-meta muted">Suggested by ' + esc(recommender) + '</span>' : '') +
+    (genres ? '<span class="fresh-meta">' + esc(genres) + '</span>' : '') +
+    (title.summary ? '<span class="fresh-summary muted">' + esc(title.summary) + '</span>' : '') +
+    '</span></button>';
 }
 
 function wireFreshPicks() {
@@ -268,7 +292,6 @@ function wireFreshPicks() {
   if (!rail) return;
   attachPosters(rail);
   const panels = [...rail.children];
-  if (panels.length < 2) return;
   let index = panels.findIndex(panel => panel.firstElementChild.dataset.poster === freshTitleId);
 
   function select(next) {
@@ -286,10 +309,19 @@ function wireFreshPicks() {
       }
     },5000);
   }
-  $('fresh-prev').addEventListener('click', () => { select(index - 1); schedule(); });
-  $('fresh-next').addEventListener('click', () => { select(index + 1); schedule(); });
-  panels.forEach((panel,i) => panel.addEventListener('click', () => { select(i); schedule(); }));
-  schedule();
+  panels.forEach((panel,i) => panel.addEventListener('click', () => {
+    if (i === index) {
+      showDetail(freshTitleId);
+      return;
+    }
+    select(i);
+    schedule();
+  }));
+  if (panels.length > 1) {
+    $('fresh-prev').addEventListener('click', () => { select(index - 1); schedule(); });
+    $('fresh-next').addEventListener('click', () => { select(index + 1); schedule(); });
+    schedule();
+  }
 }
 function renderBrowse() {
   const types = [...new Set(state.titles.map(t => t.type).filter(Boolean))].sort();
