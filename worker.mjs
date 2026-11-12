@@ -62,7 +62,7 @@ export default {
         if (location.origin !== 'https://script.googleusercontent.com') {
           return fail('Check that the Apps Script deployment allows Anyone to access it.',502);
         }
-        upstream = await fetch(location,{redirect:'error'});
+        upstream = await ffetch(location.href,{redirect:'manual'});
       }
       if (!upstream.ok || !upstream.headers.get('Content-Type')?.includes('application/json')) {
         return fail('Google did not return JSON. Check your Apps Script deployment and permissions.',502);
