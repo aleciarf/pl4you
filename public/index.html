@@ -114,6 +114,12 @@ main{width:min(1320px,90%);margin-top:clamp(20px,4vw,50px)}
 .fresh-dot::before{content:"";width:10px;height:10px;border-radius:50%;background:#d9c6d3}
 .fresh-dot[aria-current=true]::before{background:var(--pink)}
 @media(prefers-reduced-motion:reduce){.fresh-rail.is-draggable{translate:none}}
+
+.fresh-rail{position:relative}
+.fresh-poster-motion{position:absolute;z-index:3;object-fit:cover;pointer-events:none}
+.fresh-arrows{display:flex;gap:5px}
+.fresh-arrows button{width:38px;height:34px;padding:0;border:0;background:none;color:var(--pink);opacity:.46;transition:opacity 180ms ease}
+.fresh-arrows button:hover,.fresh-arrows button:focus-visible{opacity:1}
 </style>
 </head>
 <body>
@@ -322,8 +328,10 @@ function renderFreshPicks() {
   const dots = titles.map((title,i) =>
     '<button type="button" class="fresh-dot" aria-label="Show item ' + (i + 1) + ' of ' +
     titles.length + ': ' + esc(title.name) + '" aria-current="' + (title.id === freshTitleId) + '"></button>');
-  return '<section aria-labelledby="fresh-heading"><div class="fresh-head"><h2 id="fresh-heading">Fresh Picks</h2></div>' +
-    '<div id="fresh-rail" class="fresh-rail" role="group" aria-label="Recent posters">' +
+  return '<section aria-labelledby="fresh-heading"><div class="fresh-head"><h2 id="fresh-heading">Fresh Picks</h2>' +
+    (titles.length > 1 ? '<div class="fresh-arrows"><button type="button" id="fresh-prev" aria-label="Previous poster">←</button>' +
+      '<button type="button" id="fresh-next" aria-label="Next poster">→</button></div>' : '') +
+    '</div><div id="fresh-rail" class="fresh-rail" role="group" aria-label="Recent posters">' +
     titles.map(renderFreshPanel).join('') + '</div>' +
     '<div id="fresh-dots" class="fresh-dots" role="group" aria-label="Carousel position">' + dots.join('') + '</div></section>';
 }
@@ -342,6 +350,34 @@ function renderFreshPanel(title) {
     '<span class="fresh-link">View details <span aria-hidden="true">↗</span></span></span></button>';
 }
 
+function animateFreshPoster(rail, image, start, overlap) {
+  const end = image.getBoundingClientRect();
+  const bounds = rail.getBoundingClientRect();
+  const scale = Math.min(end.width / image.naturalWidth,end.height / image.naturalHeight);
+  const width = image.naturalWidth * scale;
+  const height = image.naturalHeight * scale;
+  const ghost = document.createElement('img');
+  ghost.className = 'fresh-poster-motion';
+  ghost.src = image.currentSrc || image.src;
+  ghost.alt = '';
+  ghost.setAttribute('aria-hidden','true');
+  rail.append(ghost);
+  const animation = ghost.animate([
+    {left:(start.left - bounds.left) + 'px',top:(start.top - bounds.top) + 'px',
+      width:start.width + 'px',height:start.height + 'px',opacity:.42,filter:'blur(5px)',
+      clipPath:'inset(0 0 0 ' + overlap + 'px)'},
+    {left:(end.right - width - bounds.left) + 'px',top:(end.top + (end.height - height)/2 - bounds.top) + 'px',
+      width:width + 'px',height:height + 'px',opacity:1,filter:'blur(0px)',clipPath:'inset(0)'}
+  ],{duration:520,easing:'cubic-bezier(.22,.72,.22,1)'});
+  image.style.opacity = '0';
+  function finish() {
+    ghost.remove();
+    image.style.removeProperty('opacity');
+  }
+  animation.finished.then(finish,finish);
+  return animation;
+}
+
 function wireFreshPicks() {
   const rail = $('fresh-rail');
   if (!rail) return;
@@ -351,8 +387,17 @@ function wireFreshPicks() {
   let suppressClick = false;
   let index = panels.findIndex(panel => panel.firstElementChild.dataset.poster === freshTitleId);
 
+  let posterMotion;
   function select(next) {
-    index = (next + panels.length) % panels.length;
+    const target = (next + panels.length) % panels.length;
+    const incoming = panels[target];
+    const image = incoming.firstElementChild;
+    const shouldAnimate = target !== index && incoming.hasAttribute('data-next') &&
+      image.naturalWidth && !reducedMotion.matches && typeof image.animate === 'function';
+    const start = shouldAnimate ? incoming.getBoundingClientRect() : null;
+    const overlap = start ? Math.max(0,panels[index].getBoundingClientRect().right - start.left) : 0;
+    if (target !== index && posterMotion?.playState === 'running') posterMotion.finish();
+    index = target;
     const upcoming = panels.length > 1 ? (index + 1) % panels.length : -1;
     panels.forEach((panel,i) => {
       panel.setAttribute('aria-pressed',String(i === index));
@@ -360,6 +405,7 @@ function wireFreshPicks() {
       dots[i].setAttribute('aria-current',String(i === index));
     });
     freshTitleId = panels[index].firstElementChild.dataset.poster;
+    if (start) posterMotion = animateFreshPoster(rail,image,start,overlap);
   }
   select(index);
   attachPosters(rail);
@@ -382,6 +428,8 @@ function wireFreshPicks() {
   }));
   dots.forEach((dot,i) => dot.addEventListener('click', () => { select(i); schedule(); }));
   if (panels.length < 2) return;
+  $('fresh-prev').addEventListener('click', () => { select(index - 1); schedule(); });
+  $('fresh-next').addEventListener('click', () => { select(index + 1); schedule(); });
 
   rail.classList.add('is-draggable');
   rail.addEventListener('dragstart', event => event.preventDefault());
