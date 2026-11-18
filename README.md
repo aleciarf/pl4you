@@ -1,6 +1,6 @@
-# PL4YOU on Cloudflare Workers
+# MIXUP on Cloudflare Workers
 
-This package contains the PL4YOU HTML site, a Cloudflare Worker, and the
+This package contains the MIXUP HTML site, a Cloudflare Worker, and the
 Google Apps Script that stores club records and posters.
 
 ## 1. Set up Google storage
@@ -42,7 +42,7 @@ Files in the Drive folder follow that folder's Google sharing permissions.
 
 ## 3. Verify your deployment
 
-Add a member and a test title with a JPG or PNG poster under 1 MB. Reload PL4YOU
+Add a member and a test title with a JPG or PNG poster under 1 MB. Reload MIXUP
 and confirm the title and poster still appear. Check the supplied Drive folder
 for the spreadsheet and the uploaded image inside the poster subfolder. Try
 Tinderbox and confirm that **Watched** updates **My List** and **Stats**.
