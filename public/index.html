@@ -20,8 +20,6 @@ dialog{background:var(--panel);color:var(--white);border:1px solid var(--line);b
 
 .fresh-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
 .fresh-head h2{margin:0}
-.fresh-controls{display:flex;gap:6px}
-.fresh-controls button{padding:6px 12px}
 .tile{transition:transform 180ms ease}
 .tinder-stage{display:grid;grid-template-columns:clamp(40px,12vw,60px) minmax(0,300px) clamp(40px,12vw,60px);align-items:center;justify-content:center;gap:clamp(8px,3vw,24px);overflow:hidden;padding:12px 4px}
 .tinder-stage .deck{width:100%;margin:0;transform:translate(var(--drag-x,0px),var(--drag-y,0px)) rotate(var(--drag-angle,0deg));transition:transform 200ms ease;position:relative;z-index:1}
@@ -65,8 +63,7 @@ nav .nav-icon[aria-current=page]{background:none;border-bottom-color:var(--pink)
 .ui-icon{filter:none}
 .primary{background:linear-gradient(125deg,#FCA0D6,var(--lavender));border:0;color:#28132b}
 input,select,textarea{background:#fff9fd;color:var(--white)}
-#memberButton,.fresh-controls button{background:none;border:0}
-.fresh-controls button{min-width:42px;min-height:42px;border-radius:0;border-bottom:1px solid var(--line)}
+#memberButton{background:none;border:0}
 main{width:min(1320px,90%);margin-top:clamp(20px,4vw,50px)}
 .fresh-head{margin-bottom:12px}
 .fresh-head h2,#catalog h2{font-size:clamp(22px,2.8vw,36px);letter-spacing:-.04em}
@@ -108,6 +105,15 @@ main{width:min(1320px,90%);margin-top:clamp(20px,4vw,50px)}
 }
 @keyframes feature-in{from{opacity:.65}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.tile,.fresh-panel,.tinder-stage .deck{transition:none;animation:none;transform:none}}
+
+.fresh-rail.is-draggable{touch-action:pan-y;user-select:none;translate:var(--drag-offset,0px) 0}
+.fresh-rail.is-draggable .fresh-panel{cursor:grab}
+.fresh-rail.is-draggable[style*="--drag-offset"] .fresh-panel{cursor:grabbing}
+.fresh-dots{display:flex;justify-content:center;gap:5px;margin-top:9px}
+.fresh-dot{display:grid;place-items:center;width:27px;height:27px;padding:0;border:0;background:none;border-radius:50%}
+.fresh-dot::before{content:"";width:10px;height:10px;border-radius:50%;background:#d9c6d3}
+.fresh-dot[aria-current=true]::before{background:var(--pink)}
+@media(prefers-reduced-motion:reduce){.fresh-rail.is-draggable{translate:none}}
 </style>
 </head>
 <body>
@@ -313,14 +319,13 @@ function renderFreshPicks() {
   const titles = state.titles.filter(title => title.poster).slice(-5).reverse();
   if (!titles.length) return '';
   if (!titles.some(title => title.id === freshTitleId)) freshTitleId = titles[0].id;
-  const leftCount = Math.floor((titles.length - 1) / 2);
-  if (leftCount) titles.unshift(...titles.splice(-leftCount));
-  return '<section aria-labelledby="fresh-heading"><div class="fresh-head"><h2 id="fresh-heading">Fresh Picks</h2>' +
-    (titles.length > 1 ? '<div class="fresh-controls">' +
-      '<button type="button" id="fresh-prev" aria-label="Previous poster">←</button>' +
-      '<button type="button" id="fresh-next" aria-label="Next poster">→</button></div>' : '') +
-    '</div><div id="fresh-rail" class="fresh-rail" role="group" aria-label="Recent posters">' +
-    titles.map(renderFreshPanel).join('') + '</div></section>';
+  const dots = titles.map((title,i) =>
+    '<button type="button" class="fresh-dot" aria-label="Show item ' + (i + 1) + ' of ' +
+    titles.length + ': ' + esc(title.name) + '" aria-current="' + (title.id === freshTitleId) + '"></button>');
+  return '<section aria-labelledby="fresh-heading"><div class="fresh-head"><h2 id="fresh-heading">Fresh Picks</h2></div>' +
+    '<div id="fresh-rail" class="fresh-rail" role="group" aria-label="Recent posters">' +
+    titles.map(renderFreshPanel).join('') + '</div>' +
+    '<div id="fresh-dots" class="fresh-dots" role="group" aria-label="Carousel position">' + dots.join('') + '</div></section>';
 }
 function renderFreshPanel(title) {
   const recommender = memberName(title.recommended);
@@ -341,6 +346,9 @@ function wireFreshPicks() {
   const rail = $('fresh-rail');
   if (!rail) return;
   const panels = [...rail.children];
+  const dots = [...$('fresh-dots').children];
+  let drag;
+  let suppressClick = false;
   let index = panels.findIndex(panel => panel.firstElementChild.dataset.poster === freshTitleId);
 
   function select(next) {
@@ -349,6 +357,7 @@ function wireFreshPicks() {
     panels.forEach((panel,i) => {
       panel.setAttribute('aria-pressed',String(i === index));
       panel.toggleAttribute('data-next',i === upcoming);
+      dots[i].setAttribute('aria-current',String(i === index));
     });
     freshTitleId = panels[index].firstElementChild.dataset.poster;
   }
@@ -358,7 +367,7 @@ function wireFreshPicks() {
     clearInterval(freshTimer);
     if (reducedMotion.matches) return;
     freshTimer = setInterval(() => {
-      if (!document.hidden && !rail.contains(document.activeElement) && !document.querySelector('dialog[open]')) {
+      if (!drag && !document.hidden && !rail.parentElement.contains(document.activeElement) && !document.querySelector('dialog[open]')) {
         select(index + 1);
       }
     },5000);
@@ -371,11 +380,52 @@ function wireFreshPicks() {
     select(i);
     schedule();
   }));
-  if (panels.length > 1) {
-    $('fresh-prev').addEventListener('click', () => { select(index - 1); schedule(); });
-    $('fresh-next').addEventListener('click', () => { select(index + 1); schedule(); });
+  dots.forEach((dot,i) => dot.addEventListener('click', () => { select(i); schedule(); }));
+  if (panels.length < 2) return;
+
+  rail.classList.add('is-draggable');
+  rail.addEventListener('dragstart', event => event.preventDefault());
+  rail.addEventListener('pointerdown', event => {
+    if (!event.isPrimary || event.button !== 0) return;
+    suppressClick = false;
+    drag = {id:event.pointerId,x:event.clientX,y:event.clientY,horizontal:false};
+  });
+  rail.addEventListener('pointermove', event => {
+    if (drag?.id !== event.pointerId) return;
+    const dx = event.clientX - drag.x;
+    const dy = event.clientY - drag.y;
+    if (!drag.horizontal) {
+      if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) { drag = null; return; }
+      if (Math.abs(dx) < 8 || Math.abs(dx) <= Math.abs(dy)) return;
+      drag.horizontal = true;
+      rail.setPointerCapture(event.pointerId);
+    }
+    rail.style.setProperty('--drag-offset',Math.max(-12,Math.min(12,dx * .2)) + 'px');
+  });
+  function endDrag(event) {
+    if (drag?.id !== event.pointerId) return;
+    const {x,horizontal} = drag;
+    drag = null;
+    rail.style.removeProperty('--drag-offset');
+    if (!horizontal) return;
+    suppressClick = true;
+    const dx = event.clientX - x;
+    if (event.type === 'pointerup' && Math.abs(dx) >= 40) select(index + (dx < 0 ? 1 : -1));
     schedule();
   }
+  rail.addEventListener('pointerup',endDrag);
+  rail.addEventListener('pointercancel',endDrag);
+  rail.addEventListener('lostpointercapture',endDrag);
+  rail.addEventListener('pointerleave',event => {
+    if (!drag?.horizontal) endDrag(event);
+  });
+  rail.addEventListener('click',event => {
+    if (!suppressClick || event.detail === 0) return;
+    suppressClick = false;
+    event.preventDefault();
+    event.stopPropagation();
+  },true);
+  schedule();
 }
 function renderBrowse() {
   const types = [...new Set(state.titles.map(t => t.type).filter(Boolean))].sort();
