@@ -116,7 +116,12 @@ main{width:min(1320px,90%);margin-top:clamp(20px,4vw,50px)}
 @media(prefers-reduced-motion:reduce){.fresh-rail.is-draggable{translate:none}}
 
 .fresh-rail{position:relative}
-.fresh-poster-motion{position:absolute;z-index:3;object-fit:cover;pointer-events:none}
+.fresh-unfold-layer{position:absolute;inset:0;z-index:4;pointer-events:none}
+.fresh-poster-motion{position:absolute;object-fit:cover;transform-origin:top left;display:block}
+.fresh-unfold-details{position:absolute;overflow:hidden;text-align:left;background:linear-gradient(120deg,#ffe1f3 6%,#ffd2ed 56%,#ed70b5)}
+.fresh-unfold-details .fresh-details{display:grid;align-content:center;gap:10px;min-width:0;padding:clamp(20px,4vw,62px);overflow-wrap:anywhere}
+.fresh-panel[aria-pressed=true].fresh-outgoing{position:absolute;grid-area:auto;z-index:3;animation:none;pointer-events:none;min-height:0}
+.fresh-panel[aria-pressed=true].fresh-unfolding{opacity:0;animation:none;pointer-events:none}
 .fresh-arrows{display:flex;gap:5px}
 .fresh-arrows button{width:38px;height:34px;padding:0;border:0;background:none;color:var(--pink);opacity:.46;transition:opacity 180ms ease}
 .fresh-arrows button:hover,.fresh-arrows button:focus-visible{opacity:1}
@@ -350,32 +355,78 @@ function renderFreshPanel(title) {
     '<span class="fresh-link">View details <span aria-hidden="true">↗</span></span></span></button>';
 }
 
-function animateFreshPoster(rail, image, start, overlap) {
-  const end = image.getBoundingClientRect();
+function animateFreshUnfold(rail, incoming, outgoing, oldRect, start, direction) {
   const bounds = rail.getBoundingClientRect();
-  const scale = Math.min(end.width / image.naturalWidth,end.height / image.naturalHeight);
+  const image = incoming.firstElementChild;
+  const imageRect = image.getBoundingClientRect();
+  const panelRect = incoming.getBoundingClientRect();
+  const details = incoming.querySelector('.fresh-details');
+  const detailsRect = details.getBoundingClientRect();
+  const scale = Math.min(imageRect.width / image.naturalWidth,imageRect.height / image.naturalHeight);
   const width = image.naturalWidth * scale;
   const height = image.naturalHeight * scale;
-  const ghost = document.createElement('img');
-  ghost.className = 'fresh-poster-motion';
-  ghost.src = image.currentSrc || image.src;
-  ghost.alt = '';
-  ghost.setAttribute('aria-hidden','true');
-  rail.append(ghost);
-  const animation = ghost.animate([
-    {left:(start.left - bounds.left) + 'px',top:(start.top - bounds.top) + 'px',
-      width:start.width + 'px',height:start.height + 'px',opacity:.42,filter:'blur(5px)',
-      clipPath:'inset(0 0 0 ' + overlap + 'px)'},
-    {left:(end.right - width - bounds.left) + 'px',top:(end.top + (end.height - height)/2 - bounds.top) + 'px',
-      width:width + 'px',height:height + 'px',opacity:1,filter:'blur(0px)',clipPath:'inset(0)'}
-  ],{duration:520,easing:'cubic-bezier(.22,.72,.22,1)'});
-  image.style.opacity = '0';
+  const left = imageRect.right - width - bounds.left;
+  const top = imageRect.top + (imageRect.height - height)/2 - bounds.top;
+  const stacked = detailsRect.top >= imageRect.bottom - 1;
+  const options = {fill:'both',easing:'cubic-bezier(.22,.72,.22,1)'};
+  const duration = 550;
+  const delay = duration * .12;
+  const boxDuration = 350;
+  const boxStart = stacked ? 'inset(0 0 100% 0)' : 'inset(0 0 0 100%)';
+
+  outgoing.classList.add('fresh-outgoing');
+  outgoing.setAttribute('aria-hidden','true');
+  outgoing.tabIndex = -1;
+  Object.assign(outgoing.style,{
+    left:oldRect.left-bounds.left+'px',top:oldRect.top-bounds.top+'px',
+    width:oldRect.width+'px',height:oldRect.height+'px'
+  });
+  const layer = document.createElement('div');
+  layer.className = 'fresh-unfold-layer';
+  layer.setAttribute('aria-hidden','true');
+  const poster = image.cloneNode(false);
+  poster.removeAttribute('data-poster');
+  poster.className = 'fresh-poster-motion';
+  Object.assign(poster.style,{left:left+'px',top:top+'px',width:width+'px',height:height+'px'});
+  const rectangle = document.createElement('div');
+  rectangle.className = 'fresh-unfold-details';
+  const boxLeft = panelRect.left - bounds.left;
+  const boxTop = stacked ? top + height - 1 : panelRect.top - bounds.top;
+  Object.assign(rectangle.style,{
+    left:boxLeft+'px',top:boxTop+'px',
+    width:(stacked ? panelRect.width : left-boxLeft+1)+'px',
+    height:panelRect.bottom-bounds.top-boxTop+'px'
+  });
+  const copy = details.cloneNode(true);
+  Object.assign(copy.style,{
+    position:'absolute',left:detailsRect.left-bounds.left-boxLeft+'px',
+    top:detailsRect.top-bounds.top-boxTop+'px',width:detailsRect.width+'px'
+  });
+  rectangle.append(copy);
+  layer.append(rectangle,poster);
+  rail.append(outgoing,layer);
+  incoming.classList.add('fresh-unfolding');
+
+  const overlap = Math.max(0,oldRect.right-start.left) * width / start.width;
+  const animations = [
+    outgoing.animate([{opacity:1,transform:'none',filter:'blur(0px)'},{
+      opacity:0,transform:'translateX('+(-29*direction)+'px) scale(.96)',filter:'blur(3px)'
+    }],{...options,duration:320}),
+    layer.animate([{transform:'translate('+(start.left-bounds.left-left)+'px,'+(start.top-bounds.top-top)+'px)'},
+      {transform:'translate(0px,0px)'}],{...options,duration}),
+    poster.animate([{transform:'scale('+start.width/width+','+start.height/height+')',opacity:.42,filter:'blur(5px) saturate(.75)'},
+      {transform:'none',opacity:1,filter:'blur(0px) saturate(1)'}],{...options,duration}),
+    poster.animate([{clipPath:'inset(0 0 0 '+overlap+'px)'},{clipPath:'inset(0)'}],{...options,duration:delay}),
+    rectangle.animate([{clipPath:boxStart},{clipPath:'inset(0)'}],{...options,delay,duration:boxDuration}),
+    copy.animate([{opacity:0},{opacity:1}],{...options,delay:delay+boxDuration*.64,duration:190})
+  ];
   function finish() {
-    ghost.remove();
-    image.style.removeProperty('opacity');
+    outgoing.remove();
+    layer.remove();
+    incoming.classList.remove('fresh-unfolding');
+    animations.forEach(animation => animation.cancel());
   }
-  animation.finished.then(finish,finish);
-  return animation;
+  Promise.allSettled(animations.map(animation => animation.finished)).then(finish);
 }
 
 function wireFreshPicks() {
@@ -387,16 +438,22 @@ function wireFreshPicks() {
   let suppressClick = false;
   let index = panels.findIndex(panel => panel.firstElementChild.dataset.poster === freshTitleId);
 
-  let posterMotion;
   function select(next) {
     const target = (next + panels.length) % panels.length;
     const incoming = panels[target];
     const image = incoming.firstElementChild;
-    const shouldAnimate = target !== index && incoming.hasAttribute('data-next') &&
+    if (rail.querySelector('.fresh-unfold-layer')) return;
+    const shouldAnimate = index >= 0 && target !== index &&
       image.naturalWidth && !reducedMotion.matches && typeof image.animate === 'function';
-    const start = shouldAnimate ? incoming.getBoundingClientRect() : null;
-    const overlap = start ? Math.max(0,panels[index].getBoundingClientRect().right - start.left) : 0;
-    if (target !== index && posterMotion?.playState === 'running') posterMotion.finish();
+    const oldPanel = panels[index];
+    const oldRect = shouldAnimate ? oldPanel.getBoundingClientRect() : null;
+    const outgoing = shouldAnimate ? oldPanel.cloneNode(true) : null;
+    const start = !shouldAnimate ? null : incoming.hasAttribute('data-next') ?
+      incoming.getBoundingClientRect() : {
+        left:oldRect.right - 24 - oldRect.width*.16,top:oldRect.top+oldRect.height*.14,
+        width:oldRect.width*.20,height:oldRect.height*.72
+      };
+    const direction = next < index ? -1 : 1;
     index = target;
     const upcoming = panels.length > 1 ? (index + 1) % panels.length : -1;
     panels.forEach((panel,i) => {
@@ -405,7 +462,7 @@ function wireFreshPicks() {
       dots[i].setAttribute('aria-current',String(i === index));
     });
     freshTitleId = panels[index].firstElementChild.dataset.poster;
-    if (start) posterMotion = animateFreshPoster(rail,image,start,overlap);
+    if (start) animateFreshUnfold(rail,incoming,outgoing,oldRect,start,direction);
   }
   select(index);
   attachPosters(rail);
