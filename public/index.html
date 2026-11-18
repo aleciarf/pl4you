@@ -47,7 +47,9 @@ dialog{background:var(--panel);color:var(--white);border:1px solid var(--line);b
 /* Soft Pop */
 :root{--bg:#fff0f8;--panel:#fff9fd;--line:#70284f30;--muted:#6e4867;--pink:#bd2165;--white:#260d26;--rating:#a62062;--lavender:#B183CB}
 body{background:var(--bg)}
-header{background:var(--bg)}
+header{background:var(--bg);justify-content:flex-start}
+header > .actions{margin-inline-start:auto}
+@media(min-width:621px){header{column-gap:clamp(14px,2vw,30px)}}
 .brand{display:flex;align-items:center;gap:10px;background:none;border:0;padding:5px 0;font:800 22px/1 'Lexend Deca',sans-serif;letter-spacing:-.05em}
 .brand img{display:block;object-fit:contain}
 nav .nav-icon{display:inline-flex;align-items:center;gap:6px;padding:8px 3px;border:0;border-bottom:2px solid transparent;border-radius:0;font:700 11px/1.2 'Lexend Deca',sans-serif;letter-spacing:.045em;white-space:nowrap}
@@ -112,7 +114,7 @@ main{width:min(1320px,90%);margin-top:clamp(20px,4vw,50px)}
 <header>
 <button type="button" class="brand" data-view="browse"><img src="./mixup-logo.png" width="34" height="34" alt=""><span>MIXUP</span></button>
 <nav aria-label="Views"><button type="button" class="nav-icon" data-view="browse"><span class="nav-glyph" style="--glyph:url(./icons/home_3917743.svg)" aria-hidden="true"></span><span>HOME</span></button><button type="button" class="nav-icon" data-view="tinder"><span class="nav-glyph" style="--glyph:url(./icons/smiley-comment-alt_9291741.svg)" aria-hidden="true"></span><span>TINDERBOX</span></button><button type="button" class="nav-icon" data-view="list"><span class="nav-glyph" style="--glyph:url(./icons/following_3917798.svg)" aria-hidden="true"></span><span>TO WATCH</span></button><button type="button" class="nav-icon" data-view="stats"><span class="nav-glyph" style="--glyph:url(./icons/analyse_14700813.svg)" aria-hidden="true"></span><span>STATS</span></button></nav>
-<div class="actions"><div class="browsing-member"><label class="profile-picker"><span id="profile-name" aria-hidden="true">Choose member</span><select id="profile" aria-label="Active member"></select></label><span id="browsing-text" hidden>is browsing.</span></div><button id="memberButton" type="button">Join club</button><button class="primary" id="newTitle" type="button">Add new Title</button></div>
+<div class="actions"><div class="browsing-member"><label class="profile-picker"><span id="profile-name" aria-hidden="true">Guest</span><select id="profile" aria-label="Active member"><option value="">Guest</option></select></label><span>is browsing.</span></div><button id="memberButton" type="button">Join club</button><button class="primary" id="newTitle" type="button">New Mix</button></div>
 </header>
 <main>
 <div id="mode" class="demo"></div>
@@ -233,11 +235,10 @@ function setActive(id) {
 }
 function refreshProfile() {
   if (active && !memberName(active)) setActive('');
-  $('profile').innerHTML = '<option value="">Choose member</option>' + state.members.map(m =>
+  $('profile').innerHTML = '<option value="">Guest</option>' + state.members.map(m =>
     '<option value="' + esc(m.id) + '">' + esc(m.name) + '</option>').join('');
   $('profile').value = active;
-  $('profile-name').textContent = memberName(active) || 'Choose member';
-  $('browsing-text').hidden = !active;
+  $('profile-name').textContent = memberName(active) || 'Guest';
   const options = new Map(suggested.map(g => [g.toLowerCase(),g]));
   state.titles.flatMap(genreList).forEach(g => options.set(g.toLowerCase(),g));
   $('genres').innerHTML = [...options.values()].sort().map(g => '<option value="' + esc(g) + '">').join('');
