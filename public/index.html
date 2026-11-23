@@ -133,6 +133,63 @@ main{width:calc(100% - 2 * clamp(16px,3vw,64px));margin-top:clamp(20px,4vw,50px)
 .review-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .review-rating{color:#b52373;letter-spacing:2px}.review-rating small{letter-spacing:0}
 .review-date{font-size:12px;color:var(--muted);margin:5px 0 10px}.review-comment{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;line-height:1.6}
+
+/* Bounded carousel; change this value to adjust its maximum width. */
+:root{--fresh-max-width:1160px}
+section[aria-labelledby="fresh-heading"]{width:100%;max-width:var(--fresh-max-width)}
+.fresh-rail{--feature-height:480px;--preview-overlap:38px}
+.fresh-panel[aria-pressed=true]{grid-template-columns:minmax(0,1fr) calc(var(--feature-height) * 2 / 3)}
+.fresh-panel[aria-pressed=true] img{width:100%;max-width:none;object-fit:contain}
+.fresh-panel[aria-pressed=true] .fresh-details,.fresh-unfold-details .fresh-details{padding:32px;gap:14px}
+.fresh-title{font-size:clamp(44px,5vw,74px);line-height:1}
+.fresh-meta{font-size:15px;line-height:1.5}
+.fresh-summary{font-size:17px;line-height:1.65;-webkit-line-clamp:4;color:#57354f}
+.fresh-score{font-size:28px}.fresh-score small{font-size:13px}.fresh-link{font-size:15px}
+.fresh-panel[data-next]{width:calc(var(--feature-height) * .43)}
+.fresh-panel[aria-pressed=true]::before{opacity:.55;width:84%;right:-24%}
+#detailDialog{width:min(1180px,calc(100vw - 40px));max-height:90dvh;padding:30px;border-radius:24px;background:radial-gradient(ellipse at 95% 0%,#fca0d635,transparent 48%),#fff9fd;box-shadow:0 30px 100px #451c4938}
+#detailDialog .dialog-head{align-items:center;margin-bottom:24px}
+#detailHeading{font-size:clamp(26px,3vw,36px);margin:0;letter-spacing:-.04em}
+#detailBody{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,1fr);gap:32px;align-items:start}
+#detailDialog .detail{grid-template-columns:minmax(150px,38%) minmax(0,1fr);gap:22px}
+#detailDialog .detail .art{align-self:start;border-radius:14px;box-shadow:0 12px 28px #65275020}
+#detailDialog .detail p{font-size:15px;line-height:1.7}
+#detailDialog .reviews{margin:0;padding:0 0 0 28px;border-top:0;border-left:1px solid #e9cddd;min-width:0}
+#detailDialog .reviews h3{font-size:23px;letter-spacing:-.035em}
+.review-kicker{color:#ac3279;font-size:11px;font-weight:700;letter-spacing:.14em;margin-bottom:8px}
+#reviewForm{background:linear-gradient(130deg,#fce1f1,#eee2f6);padding:20px;border-radius:18px}
+#reviewForm textarea{background:#fffafedb;border-color:#dfb6d3;min-height:110px;font-size:15px}
+#reviewForm label{font-size:13px}#reviewForm .primary{border-radius:99px;padding:10px 20px}
+.rating-picker{display:flex;gap:5px;flex-wrap:wrap}.rating-choice{position:relative;cursor:pointer}
+.rating-choice input{position:absolute;opacity:0;width:1px;height:1px}
+.rating-choice span{display:grid;place-items:center;width:39px;height:39px;font-size:28px;color:#c9adc2;border-radius:10px;transition:transform .18s ease,color .18s ease,background .18s ease}
+.rating-choice.is-filled span{color:#bc367e;background:#ffffff80}
+.rating-choice:hover span{transform:translateY(-3px) rotate(-8deg);color:#c1247c}
+.rating-choice:has(input:focus-visible) span{outline:2px solid #a82e78;outline-offset:3px}
+.review{border-color:#eddae6}.review-meta strong{font-size:15px}.review-rating{color:#bc367e}
+@media(min-width:641px) and (max-width:960px){
+ .fresh-rail{--feature-height:420px;--preview-overlap:28px}.fresh-panel[data-next]{width:110px}
+ .fresh-panel[aria-pressed=true] .fresh-details,.fresh-unfold-details .fresh-details{padding:24px;gap:10px}
+ .fresh-title{font-size:46px}.fresh-summary{font-size:16px}.fresh-meta{font-size:13px}
+ #detailDialog .detail{grid-template-columns:1fr}#detailDialog .detail .art{max-width:180px}
+}
+@media(max-width:720px){
+ #detailDialog{width:calc(100vw - 20px);padding:22px;max-height:92dvh}
+ #detailBody{grid-template-columns:1fr;gap:26px}
+ #detailDialog .reviews{padding:24px 0 0;border-left:0;border-top:1px solid #e9cddd}
+ #detailDialog .detail{grid-template-columns:minmax(100px,32%) minmax(0,1fr);gap:16px}
+}
+@media(max-width:640px){
+ .fresh-rail{--feature-height:300px;--preview-overlap:24px}
+ .fresh-panel[aria-pressed=true]{grid-template-columns:minmax(0,1fr)}
+ .fresh-panel[aria-pressed=true] img{width:auto;max-width:100%;height:300px;justify-self:center}
+ .fresh-panel[aria-pressed=true] .fresh-details,.fresh-unfold-details .fresh-details{padding:22px;gap:12px}
+ .fresh-panel[data-next]{width:min(20vw,90px);margin-top:32px}
+ .fresh-title{font-size:44px}.fresh-summary{font-size:16px}.fresh-meta{font-size:14px}
+}
+@media(max-width:420px){#detailDialog .detail{grid-template-columns:1fr}#detailDialog .detail .art{max-width:180px}}
+@media(prefers-reduced-motion:reduce){.rating-choice span{transition:none}.rating-choice:hover span{transform:none}}
+
 </style>
 </head>
 <body>
@@ -767,10 +824,10 @@ function reviewSection(id) {
   const reviews = (state.reviews || []).filter(r => r.titleId === id).sort((a,b) => b.createdAt.localeCompare(a.createdAt));
   const mine = reviews.find(r => r.memberId === active);
   const average = reviews.length ? (reviews.reduce((sum,r) => sum + Number(r.stars),0) / reviews.length).toFixed(1) : '';
-  return '<section class="reviews" aria-label="Member reviews"><h3>Club reviews</h3>' +
+  return '<section class="reviews" aria-label="Member reviews"><div class="review-kicker">THE AFTER-CREDITS CLUB ✦</div><h3>Club reviews</h3>' +
     '<p class="muted">' + (reviews.length ? average + ' / 5 · ' + reviews.length + (reviews.length === 1 ? ' review' : ' reviews') : 'No reviews yet. Start the conversation.') + '</p>' +
-    (active ? '<form id="reviewForm" data-title="' + esc(id) + '" data-member="' + esc(active) + '"><h4>' + (mine ? 'Edit your review' : 'Leave a review') + ' · ' + esc(memberName(active)) + '</h4><label>Your rating<select name="rating" required><option value="">Choose stars</option>' +
-      [1,2,3,4,5].map(n => '<option value="' + n + '"' + (Number(mine?.stars) === n ? ' selected' : '') + '>' + '★'.repeat(n) + ' · ' + n + '/5</option>').join('') + '</select></label><label>Your comment<textarea name="comment" rows="3" maxlength="3000" required placeholder="What did you think?">' + esc(mine?.comment || '') + '</textarea></label><div class="actions"><button class="primary">' + (mine ? 'Save changes' : 'Post review') + '</button></div><p class="form-error" role="alert"></p></form>' : '<p class="muted">Select your name in the browsing menu to leave a review.</p>') +
+    (active ? '<form id="reviewForm" data-title="' + esc(id) + '" data-member="' + esc(active) + '"><h4>' + (mine ? 'Edit your review' : 'Leave a review') + ' · ' + esc(memberName(active)) + '</h4><fieldset style="border:0;padding:0;margin:0"><legend>Your rating</legend><div class="rating-picker">' +
+      [1,2,3,4,5].map(n => '<label class="rating-choice' + (Number(mine?.stars) >= n ? ' is-filled' : '') + '"><input type="radio" name="rating" value="' + n + '" required aria-label="' + n + (n === 1 ? ' star' : ' stars') + '"' + (Number(mine?.stars) === n ? ' checked' : '') + '><span aria-hidden="true">★</span></label>').join('') + '</div></fieldset><label>Your comment<textarea name="comment" rows="3" maxlength="3000" required placeholder="What did you think?">' + esc(mine?.comment || '') + '</textarea></label><div class="actions"><button class="primary">' + (mine ? 'Save changes' : 'Post review') + '</button></div><p class="form-error" role="alert"></p></form>' : '<p class="muted">Select your name in the browsing menu to leave a review.</p>') +
     reviews.map(r => '<article class="review"><div class="review-meta"><strong>' + esc(memberName(r.memberId) || 'Member') + '</strong><span class="review-rating" aria-label="' + Number(r.stars) + ' out of 5 stars">' + '★'.repeat(Number(r.stars)) + ' <small>' + Number(r.stars) + '/5</small></span></div><p class="review-date">' + esc(reviewDate(r.createdAt)) + (r.updatedAt !== r.createdAt ? ' · Edited ' + esc(reviewDate(r.updatedAt)) : '') + '</p><p class="review-comment">' + esc(r.comment) + '</p></article>').join('') + '</section>';
 }
 async function saveReviewForm(event) {
@@ -810,6 +867,10 @@ function showDetail(id) {
     (active && status === 'watched' ? action('Undo watched','change',id + ':') : '') +
     action('Edit','edit',id) + '</div></div></div>' + reviewSection(id);
   $('reviewForm')?.addEventListener('submit', saveReviewForm);
+  $('reviewForm')?.addEventListener('change', event => {
+    if (event.target.name !== 'rating') return;
+    $('reviewForm').querySelectorAll('.rating-choice').forEach(label => label.classList.toggle('is-filled', Number(label.querySelector('input').value) <= Number(event.target.value)));
+  });
   if (!$('detailDialog').open) $('detailDialog').showModal();
   attachPosters($('detailBody'));
 }

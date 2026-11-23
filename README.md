@@ -58,3 +58,5 @@ You can also open `public/index.html` directly to try the local browser demo.
 Title details now include editable member comments, personal 1–5 star ratings, original posting dates, edited dates, and an average review rating. Select a member to write or update that member's one review per title. Shared profiles are not authenticated accounts.
 
 Update `public/index.html`, `worker.mjs`, and `google/Code.gs` together. In Apps Script, replace Code.gs, save, then use Deploy → Manage deployments → Edit → New version → Deploy, keeping the existing web-app URL. Deploy the updated Cloudflare package through your usual GitHub workflow. The Reviews sheet is created automatically; your existing titles, members, and watch lists remain in place. No new secrets or setup run are needed.
+
+Fresh Picks has a 1160px maximum width (edit --fresh-max-width), larger text, and a dedicated 320 × 480px desktop poster. Title dialogs now show reviews beside details on desktop, stack on mobile, and include clickable rating stars.
