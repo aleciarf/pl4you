@@ -1,4 +1,4 @@
-const METHODS = new Set(['getState', 'getPoster', 'addMember', 'saveTitle', 'setStatus', 'saveReview']);
+const METHODS = new Set(['getState', 'getPoster', 'addMember', 'saveTitle', 'setStatus', 'saveReview', 'saveMemberProfile']);
 const MAX_BODY = 1_500_000;
 
 function json(body, status = 200) {

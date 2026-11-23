@@ -11,7 +11,7 @@ function doPost(event) {
     if (!secret || typeof request.secret !== 'string' || !sameSecret_(secret, request.secret)) {
       return json_({ok:false, error:'Google backend authentication failed.'});
     }
-    const actions = {getState, addMember, saveTitle, setStatus, getPoster, saveReview};
+    const actions = {getState, addMember, saveTitle, setStatus, getPoster, saveReview, saveMemberProfile};
     if (!Object.prototype.hasOwnProperty.call(actions, request.method) || !Array.isArray(request.args)) {
       return json_({ok:false, error:'Unknown operation.'});
     }
@@ -245,6 +245,21 @@ function saveReview(memberId, titleId, comment, stars) {
     const now = new Date().toISOString();
     save_(book, 'Reviews', {id, memberId, titleId, comment, stars,
       createdAt: previous ? previous.createdAt : now, updatedAt: now}, previous && previous.row);
+    return state_(book);
+  });
+}
+
+function saveMemberProfile(memberId, status, picks) {
+  if (typeof status !== 'string' || status.length > 160) throw new Error('Keep your status within 160 characters.');
+  if (!Array.isArray(picks) || picks.length > 3 || new Set(picks).size !== picks.length) throw new Error('Choose up to three different titles.');
+  return locked_(() => {
+    const book = database_();
+    const member = read_(book, 'Members').find(m => m.id === memberId);
+    if (!member) throw new Error('Select a valid member.');
+    const titles = read_(book, 'Titles');
+    if (picks.some(id => typeof id !== 'string' || !titles.some(t => t.id === id))) throw new Error('A selected title could not be found.');
+    const {row, ...record} = member;
+    save_(book, 'Members', {...record, status:status.trim(), picks}, row);
     return state_(book);
   });
 }

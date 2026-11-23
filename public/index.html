@@ -190,6 +190,36 @@ section[aria-labelledby="fresh-heading"]{width:100%;max-width:var(--fresh-max-wi
 @media(max-width:420px){#detailDialog .detail{grid-template-columns:1fr}#detailDialog .detail .art{max-width:180px}}
 @media(prefers-reduced-motion:reduce){.rating-choice span{transition:none}.rating-choice:hover span{transform:none}}
 
+section[aria-labelledby="fresh-heading"]{max-width:none;width:100%}
+.fresh-rail{--feature-height:clamp(460px,37vw,630px)}
+.fresh-panel[aria-pressed=true]{grid-template-columns:minmax(0,1fr) calc(var(--feature-height) * 2 / 3)}
+.fresh-summary{font-size:clamp(17px,1.45vw,22px);max-width:48ch;line-height:1.65}
+.fresh-meta{font-size:clamp(15px,1.15vw,18px)}
+.fresh-panel[aria-pressed=true] .fresh-details,.fresh-unfold-details .fresh-details{padding:clamp(26px,4vw,64px);gap:18px}
+.member-stats{padding:28px 0;border-top:1px solid #e6c7da}.member-stats>h2{margin-bottom:8px}
+.member-status{font-size:18px;color:#8e4779;max-width:65ch;white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 22px}
+.member-stats .stat-grid{grid-template-columns:.9fr 1.3fr 1fr;gap:30px}.member-stats .stat-card{padding:0;border:0}
+.defining-three h3{margin:0}.trio-head{display:flex;gap:12px;align-items:center;justify-content:space-between}.trio-head button{font-size:12px;background:none;padding:7px 10px}
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}.trio button{padding:0;background:none;border:0;text-align:left;min-width:0}.trio img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;border-radius:6px;transition:transform .2s ease}.trio button:hover img{transform:translateY(-5px) scale(1.02)}.trio small{display:block;margin-top:8px}.pick-empty{aspect-ratio:2/3;display:grid;place-items:center;border:1px dashed #c287af;color:#ac4f8b;border-radius:6px}
+#profileDemoDialog{width:min(640px,94vw)}.demo-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-height:38vh;overflow:auto;margin:16px 0}.demo-picker label{position:relative;font-size:12px;cursor:pointer}.demo-picker img{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:6px}.demo-picker input{position:absolute;top:8px;left:8px;accent-color:#bb2877}.demo-picker label:has(input:checked) img{outline:3px solid #bb2877;outline-offset:-3px}.demo-note{font-size:12px;color:#855470;padding:8px 0}
+@media(max-width:1000px){.member-stats .stat-grid{grid-template-columns:1fr 1.5fr}.member-stats .stat-grid>.stat-card:last-child{grid-column:1/-1}}
+@media(max-width:640px){.fresh-rail{--feature-height:320px}.fresh-panel[aria-pressed=true]{grid-template-columns:1fr}.fresh-panel[aria-pressed=true] img{height:320px}.member-stats .stat-grid{grid-template-columns:1fr}.member-stats .stat-grid>.stat-card:last-child{grid-column:auto}.fresh-panel[aria-pressed=true] .fresh-details{padding:24px}.fresh-summary{font-size:17px}}
+[hidden]{display:none!important}
+/* Feathered poster study: the image floats over one continuous pink canvas. */
+.fresh-panel[aria-pressed=true]{display:block;position:relative;min-height:var(--feature-height);background:linear-gradient(110deg,#ffe1f3,#ffd5ef 65%,#f5b7df)}
+.fresh-panel[aria-pressed=true]::before{opacity:.18}
+.fresh-panel[aria-pressed=true] img{position:absolute;inset:0 0 0 auto;width:48%;height:100%;max-width:none;object-fit:contain;object-position:center;grid-area:auto;z-index:0;filter:saturate(.92);mask-image:radial-gradient(ellipse 67% 71% at 50% 50%,#000 31%,#000e 46%,#0008 60%,transparent 76%);-webkit-mask-image:radial-gradient(ellipse 67% 71% at 50% 50%,#000 31%,#000e 46%,#0008 60%,transparent 76%);animation:poster-soft-drift 16s ease-in-out infinite alternate;will-change:translate}
+.fresh-panel[aria-pressed=true] .fresh-details{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;width:55%;min-height:var(--feature-height);z-index:1;pointer-events:none}
+.fresh-panel[aria-pressed=true] .fresh-summary{max-width:43ch}
+@keyframes poster-soft-drift{from{translate:-50px 0}to{translate:0 0}}
+@media(max-width:640px){
+ .fresh-panel[aria-pressed=true]{min-height:640px}
+ .fresh-panel[aria-pressed=true] img{width:85%;height:340px;top:0;bottom:auto}
+ .fresh-panel[aria-pressed=true] .fresh-details{padding-top:310px;min-height:640px;width:100%;justify-content:flex-end}
+}
+@media(prefers-reduced-motion:reduce){.fresh-panel[aria-pressed=true] img{animation:none;translate:none}}
+
+.trio .art{display:block;width:100%;padding:0;aspect-ratio:2/3;border-radius:6px}.demo-picker .art{width:100%;aspect-ratio:2/3}.trio .art img,.demo-picker .art img{position:absolute;inset:0;width:100%;height:100%;margin:0}.trio button{color:inherit}.demo-picker label[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -226,7 +256,7 @@ section[aria-labelledby="fresh-heading"]{width:100%;max-width:var(--fresh-max-wi
 <dialog id="detailDialog"><div class="dialog-head"><h2 id="detailHeading"></h2><button type="button" class="close" aria-label="Close">×</button></div><div id="detailBody"></div></dialog>
 <datalist id="genres"></datalist>
 <div id="toast" role="status"></div>
-<script>
+<dialog id="profileDemoDialog"><form id="demoProfileForm"><div class="dialog-head"><h2>Your movie personality</h2><button type="button" class="close" aria-label="Close">×</button></div><label>Your status<textarea id="demoStatus" maxlength="160" rows="2" placeholder="A little line about you and your movie taste…"></textarea></label><p class="muted" style="font-size:12px">Up to 160 characters · Shown below your name</p><h3>Choose your defining three</h3><input id="demoPickSearch" type="search" placeholder="Search titles" aria-label="Search titles"><p id="demoPickMessage" role="status"></p><div id="demoPicks" class="demo-picker"></div><button class="primary">Save my profile</button></form></dialog><script>
 'use strict';
 const $ = id => document.getElementById(id);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
@@ -277,6 +307,12 @@ function localCall(method, args) {
     if (old) db.titles[db.titles.indexOf(old)] = title;
     else db.titles.push(title);
     completed.forEach(id => status(id,title.id,'watched'));
+  }
+  if (method === 'saveMemberProfile') {
+    const [id,status,picks] = args;
+    const member = db.members.find(m => m.id === id);
+    if (!member) throw new Error('Select a valid member.');
+    member.status = status; member.picks = picks;
   }
   if (method === 'saveReview') {
     const [memberId,titleId,comment,stars] = args;
@@ -429,78 +465,8 @@ function renderFreshPanel(title) {
     '<span class="fresh-link">View details <span aria-hidden="true">↗</span></span></span></button>';
 }
 
-function animateFreshUnfold(rail, incoming, outgoing, oldRect, start, direction) {
-  const bounds = rail.getBoundingClientRect();
-  const image = incoming.firstElementChild;
-  const imageRect = image.getBoundingClientRect();
-  const panelRect = incoming.getBoundingClientRect();
-  const details = incoming.querySelector('.fresh-details');
-  const detailsRect = details.getBoundingClientRect();
-  const scale = Math.min(imageRect.width / image.naturalWidth,imageRect.height / image.naturalHeight);
-  const width = image.naturalWidth * scale;
-  const height = image.naturalHeight * scale;
-  const left = imageRect.right - width - bounds.left;
-  const top = imageRect.top + (imageRect.height - height)/2 - bounds.top;
-  const stacked = detailsRect.top >= imageRect.bottom - 1;
-  const options = {fill:'both',easing:'cubic-bezier(.22,.72,.22,1)'};
-  const duration = 550;
-  const delay = duration * .12;
-  const boxDuration = 350;
-  const boxStart = stacked ? 'inset(0 0 100% 0)' : 'inset(0 0 0 100%)';
-
-  outgoing.classList.add('fresh-outgoing');
-  outgoing.setAttribute('aria-hidden','true');
-  outgoing.tabIndex = -1;
-  Object.assign(outgoing.style,{
-    left:oldRect.left-bounds.left+'px',top:oldRect.top-bounds.top+'px',
-    width:oldRect.width+'px',height:oldRect.height+'px'
-  });
-  const layer = document.createElement('div');
-  layer.className = 'fresh-unfold-layer';
-  layer.setAttribute('aria-hidden','true');
-  const poster = image.cloneNode(false);
-  poster.removeAttribute('data-poster');
-  poster.className = 'fresh-poster-motion';
-  Object.assign(poster.style,{left:left+'px',top:top+'px',width:width+'px',height:height+'px'});
-  const rectangle = document.createElement('div');
-  rectangle.className = 'fresh-unfold-details';
-  const boxLeft = panelRect.left - bounds.left;
-  const boxTop = stacked ? top + height - 1 : panelRect.top - bounds.top;
-  Object.assign(rectangle.style,{
-    left:boxLeft+'px',top:boxTop+'px',
-    width:(stacked ? panelRect.width : left-boxLeft+1)+'px',
-    height:panelRect.bottom-bounds.top-boxTop+'px'
-  });
-  const copy = details.cloneNode(true);
-  Object.assign(copy.style,{
-    position:'absolute',left:detailsRect.left-bounds.left-boxLeft+'px',
-    top:detailsRect.top-bounds.top-boxTop+'px',width:detailsRect.width+'px'
-  });
-  rectangle.append(copy);
-  layer.append(rectangle,poster);
-  rail.append(outgoing,layer);
-  incoming.classList.add('fresh-unfolding');
-
-  const overlap = Math.max(0,oldRect.right-start.left) * width / start.width;
-  const animations = [
-    outgoing.animate([{opacity:1,transform:'none',filter:'blur(0px)'},{
-      opacity:0,transform:'translateX('+(-29*direction)+'px) scale(.96)',filter:'blur(3px)'
-    }],{...options,duration:320}),
-    layer.animate([{transform:'translate('+(start.left-bounds.left-left)+'px,'+(start.top-bounds.top-top)+'px)'},
-      {transform:'translate(0px,0px)'}],{...options,duration}),
-    poster.animate([{transform:'scale('+start.width/width+','+start.height/height+')',opacity:.42,filter:'blur(5px) saturate(.75)'},
-      {transform:'none',opacity:1,filter:'blur(0px) saturate(1)'}],{...options,duration}),
-    poster.animate([{clipPath:'inset(0 0 0 '+overlap+'px)'},{clipPath:'inset(0)'}],{...options,duration:delay}),
-    rectangle.animate([{clipPath:boxStart},{clipPath:'inset(0)'}],{...options,delay,duration:boxDuration}),
-    copy.animate([{opacity:0},{opacity:1}],{...options,delay:delay+boxDuration*.64,duration:190})
-  ];
-  function finish() {
-    outgoing.remove();
-    layer.remove();
-    incoming.classList.remove('fresh-unfolding');
-    animations.forEach(animation => animation.cancel());
-  }
-  Promise.allSettled(animations.map(animation => animation.finished)).then(finish);
+function animateFreshUnfold(rail,incoming,outgoing) {
+ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) incoming.animate([{opacity:0},{opacity:1}],{duration:900,easing:'ease-in-out'});
 }
 
 function wireFreshPicks() {
@@ -648,7 +614,7 @@ function renderStats() {
   if (!state.members.length) return empty('No members yet','Add a member to start tracking what everyone watches.',action('+ Add member','member','yes',true));
   return state.members.map(renderMemberStats).join('');
 }
-function renderMemberStats(member) {
+function originalMemberStats(member) {
   const titles = state.titles.filter(t => statusOf(t.id,member.id) === 'watched');
   const queued = state.titles.filter(t => statusOf(t.id,member.id) === 'queued').length;
   const heading = '<section class="member-stats"><h2>' + esc(member.name) + '</h2>';
@@ -672,6 +638,42 @@ function renderMemberStats(member) {
       (100*g.count/titles.length) + '%"></i></div>').join('') || '<p class="muted">No genres recorded for watched titles.</p>') +
     '</div></div></section>';
 }
+function renderMemberStats(member) {
+ const fragment=document.createElement('div');fragment.innerHTML=originalMemberStats(member);
+ const section=fragment.firstElementChild, heading=section.querySelector('h2');
+ const status=document.createElement('p');status.className='member-status';status.textContent=member.status || 'Your next favorite story starts here.';heading.after(status);
+ const block=document.createElement('div');block.className='defining-three';
+ block.innerHTML='<div class="trio-head"><h3>My defining three</h3>'+(member.id===active?'<button data-demo-profile="'+esc(member.id)+'">Edit my profile ↗</button>':'')+'</div><p class="muted" style="font-size:13px;margin:6px 0">Three titles that feel like me</p><div class="trio">'+[0,1,2].map(i=>{const t=state.titles.find(t=>t.id===(member.picks||[])[i]);return t?'<button data-title="'+esc(t.id)+'">'+art(t)+'<small>'+esc(t.name)+'</small></button>':'<span class="pick-empty">＋</span>'}).join('')+'</div>';
+ const grid=section.querySelector('.stat-grid');if(grid)grid.insertBefore(block,grid.children[1]);else section.append(block);
+ return fragment.innerHTML;
+}
+let demoEditing='';
+document.addEventListener('click',e=>{
+ const button=e.target.closest('[data-demo-profile]');if(!button)return;
+ demoEditing=button.dataset.demoProfile;const member=state.members.find(m=>m.id===demoEditing);
+ document.getElementById('demoStatus').value=member.status||'';
+ document.getElementById('demoPickSearch').value='';
+ document.getElementById('demoPicks').innerHTML=state.titles.map(t=>'<label data-name="'+esc(t.name.toLowerCase())+'"><input type="checkbox" name="pick" value="'+esc(t.id)+'" '+((member.picks||[]).includes(t.id)?'checked':'')+'>'+art(t)+'<span>'+esc(t.name)+'</span></label>').join('');
+ document.getElementById('demoPickMessage').textContent='Choose up to 3 titles.';
+ document.getElementById('profileDemoDialog').showModal();
+ attachPosters(document.getElementById('demoPicks'));
+});
+document.getElementById('demoPickSearch').oninput=e=>document.querySelectorAll('#demoPicks label').forEach(label=>label.hidden=!label.dataset.name.includes(e.target.value.toLowerCase()));
+document.getElementById('demoPicks').onchange=e=>{
+ if(document.querySelectorAll('#demoPicks input:checked').length>3){e.target.checked=false;document.getElementById('demoPickMessage').textContent='Three is the magic number — remove one before adding another.';}
+ else document.getElementById('demoPickMessage').textContent=document.querySelectorAll('#demoPicks input:checked').length+' / 3 chosen';
+};
+document.getElementById('demoProfileForm').onsubmit=async e=>{
+ e.preventDefault();if(busy)return;
+ const form=e.currentTarget,button=form.querySelector('button.primary'),message=document.getElementById('demoPickMessage');
+ const status=document.getElementById('demoStatus').value.trim();
+ const picks=[...document.querySelectorAll('#demoPicks input:checked')].map(el=>el.value);
+ busy=true;button.disabled=true;
+ try{state=await call('saveMemberProfile',demoEditing,status,picks);document.getElementById('profileDemoDialog').close();render();toast('Profile updated');}
+ catch(error){message.textContent=error.message||'Unable to save your profile.';}
+ finally{busy=false;button.disabled=false;}
+};
+
 let soundEnabled = storage.get('pl4you-flip-sound') !== 'off';
 let flipAudio;
 
