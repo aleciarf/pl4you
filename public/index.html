@@ -279,6 +279,15 @@ html[data-scene=aurora] .fresh-panel[aria-pressed=true]::before{inset:-30%;width
 .fresh-panel[data-previous]{display:none!important}
 .fresh-panel[aria-pressed=true] img{position:absolute;inset:0 0 0 auto;width:46%;max-width:46%;height:100%;object-fit:cover;object-position:center;mask-image:none!important;-webkit-mask-image:none!important;animation:none!important;translate:none!important;transform:none!important;filter:none!important;opacity:1;border:0;border-radius:0;box-shadow:none;will-change:auto}
 @media(max-width:640px){.fresh-rail{grid-template-columns:minmax(0,93fr) minmax(0,7fr)}.fresh-panel[data-next]{grid-column:2;transform:translateX(-5px)}.fresh-panel[aria-pressed=true] img{width:100%;max-width:100%;height:300px;top:0;right:0;object-position:center 40%}.fresh-panel[aria-pressed=true] .fresh-details{width:100%;padding:320px 22px 22px}}
+
+/* The animated Aurora now uses each poster's sampled palette. */
+.fresh-panel{--poster-first:#e7e9ed;--poster-second:#d7dce4;--poster-third:#c8ceda;--poster-ink:#19161e}
+html[data-scene=aurora] .fresh-panel[aria-pressed=true]{background:linear-gradient(110deg,var(--poster-first),var(--poster-second),var(--poster-third),var(--poster-first));background-size:240% 240%;color:var(--poster-ink)}
+html[data-scene=aurora] .fresh-panel[aria-pressed=true]::before{background:radial-gradient(ellipse at 65% 30%,#ffffff18,transparent 50%);opacity:.35}
+html[data-scene=aurora] .fresh-panel[aria-pressed=true]::after{background:linear-gradient(115deg,transparent 30%,#ffffff14 48%,transparent 65%)}
+.fresh-panel[aria-pressed=true] .fresh-title,.fresh-panel[aria-pressed=true] .fresh-meta,.fresh-panel[aria-pressed=true] .fresh-summary,.fresh-panel[aria-pressed=true] .fresh-score,.fresh-panel[aria-pressed=true] .fresh-link{color:var(--poster-ink)}
+.fresh-panel[aria-pressed=true] .fresh-link{border-color:var(--poster-ink)}
+.fresh-panel[aria-pressed=true] .fresh-summary,.fresh-panel[aria-pressed=true] .fresh-meta.muted{opacity:.92}
 </style>
 </head>
 <body>
@@ -434,6 +443,52 @@ function art(title) {
   return '<div class="art" style="--hue:' + hue + '"><span>' + esc(title.name) + '</span>' +
     (title.poster ? '<img hidden data-poster="' + esc(title.id) + '" alt="">' : '') + '</div>';
 }
+
+const posterPalettes = new Map();
+function paletteLuminance(rgb) {
+ return rgb.map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4}).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
+}
+function paletteContrast(a,b) { const x=paletteLuminance(a),y=paletteLuminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05); }
+function paletteMix(a,b,t) {return a.map((v,i)=>Math.round(v*(1-t)+b[i]*t));}
+function paletteFromPixels(pixels) {
+ const bins=new Map();
+ for(let i=0;i<pixels.length;i+=4){
+  const rgb=[pixels[i],pixels[i+1],pixels[i+2]];if(pixels[i+3]<200)continue;
+  const max=Math.max(...rgb),min=Math.min(...rgb),sat=(max-min)/Math.max(1,max);
+  // Retain dark atmosphere while reducing the influence of pure margins and lettering.
+  const weight=(max<18||min>242?.12:1)*(.6+sat*.8);
+  const key=rgb.map(v=>v>>5).join(',');let bin=bins.get(key);
+  if(!bin){bin={weight:0,sum:[0,0,0]};bins.set(key,bin)}
+  bin.weight+=weight;rgb.forEach((v,j)=>bin.sum[j]+=v*weight);
+ }
+ const ranked=[...bins.values()].sort((a,b)=>b.weight-a.weight).map(b=>b.sum.map(v=>Math.round(v/b.weight)));
+ const main=ranked[0]||[78,84,96];
+ const secondary=ranked.find(rgb=>rgb.reduce((sum,v,i)=>sum+(v-main[i])**2,0)>4500)||main;
+ const dark=paletteLuminance(main)<.30;
+ const ink=dark?[255,255,255]:[25,22,30];
+ const anchor=dark?[0,0,0]:[255,255,255];
+ function readable(rgb){let result=rgb;for(let i=0;i<20&&paletteContrast(result,ink)<5.5;i++)result=paletteMix(result,anchor,.13);return result;}
+ const first=readable(paletteMix(main,anchor,dark?.25:.42));
+ const second=readable(paletteMix(secondary,anchor,dark?.35:.48));
+ return {first,second,third:readable(paletteMix(main,secondary,.35)),ink,dark};
+}
+function applyPosterPalette(image) {
+ const panel=image.closest('.fresh-panel');if(!panel||!image.naturalWidth)return;
+ try{
+  const key=image.currentSrc||image.src;
+  let palette=posterPalettes.get(key);
+  if(!palette){
+   const canvas=document.createElement('canvas');canvas.width=48;canvas.height=64;
+   const context=canvas.getContext('2d',{willReadFrequently:true});
+   context.drawImage(image,0,0,48,64);
+   palette=paletteFromPixels(context.getImageData(0,0,48,64).data);
+   posterPalettes.set(key,palette);
+  }
+  for(const name of ['first','second','third','ink'])panel.style.setProperty('--poster-'+name,'rgb('+palette[name].join(',')+')');
+  panel.dataset.palette=palette.dark?'dark':'light';
+ }catch(_){/* A neutral background remains if a browser blocks image sampling. */}
+}
+
 function attachPosters(root) {
   observer ||= new IntersectionObserver(entries => entries.forEach(({target,isIntersecting}) => {
     if (!isIntersecting) return;
@@ -457,7 +512,8 @@ function attachPosters(root) {
     // Hidden images have no layout box. Observe the artwork until it is visible.
     img.hidden = false;
     img.style.visibility = 'hidden';
-    img.addEventListener('load', () => { img.style.visibility = ''; }, {once:true});
+    img.addEventListener('load', () => { img.style.visibility = ''; applyPosterPalette(img); }, {once:true});
+    if(img.complete && img.naturalWidth) applyPosterPalette(img);
     observer.observe(img);
   });
 }
