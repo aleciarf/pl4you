@@ -1,4 +1,4 @@
-const TABLES = ['Members', 'Titles', 'Activity'];
+const TABLES = ['Members', 'Titles', 'Activity', 'Reviews'];
 const TYPES = ['Movie', 'Series', 'Documentary', 'Miniseries', 'Anime', 'Other'];
 
 const ROOT_FOLDER_ID = '1Am3JAoZG-3FJ2fS4pH2YsUrS6s83svhq';
@@ -11,7 +11,7 @@ function doPost(event) {
     if (!secret || typeof request.secret !== 'string' || !sameSecret_(secret, request.secret)) {
       return json_({ok:false, error:'Google backend authentication failed.'});
     }
-    const actions = {getState, addMember, saveTitle, setStatus, getPoster};
+    const actions = {getState, addMember, saveTitle, setStatus, getPoster, saveReview};
     if (!Object.prototype.hasOwnProperty.call(actions, request.method) || !Array.isArray(request.args)) {
       return json_({ok:false, error:'Unknown operation.'});
     }
@@ -88,7 +88,13 @@ function locked_(work) {
 function database_() {
   const id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
   if (!id) throw new Error('The owner needs to run setupPL4YOU in Apps Script.');
-  return SpreadsheetApp.openById(id);
+  const book = SpreadsheetApp.openById(id);
+  if (!book.getSheetByName('Reviews')) {
+    const sheet = book.insertSheet('Reviews');
+    sheet.appendRow(['ID', 'Record (JSON)']);
+    sheet.setFrozenRows(1);
+  }
+  return book;
 }
 
 function read_(book, name) {
@@ -222,4 +228,23 @@ function getPoster(titleId) {
   if (!title || !title.poster) return '';
   const blob = DriveApp.getFileById(title.poster).getBlob();
   return 'data:' + blob.getContentType() + ';base64,' + Utilities.base64Encode(blob.getBytes());
+}
+
+// Each selected member has one editable review per title.
+function saveReview(memberId, titleId, comment, stars) {
+  if (typeof comment !== 'string' || comment.length > 3000) throw new Error('Keep comments within 3,000 characters.');
+  comment = comment.trim();
+  stars = rating_(stars, 1, 5, true);
+  if (!comment || stars === '') throw new Error('Add a comment and choose 1–5 stars.');
+  return locked_(() => {
+    const book = database_();
+    member_(read_(book, 'Members'), memberId);
+    if (!read_(book, 'Titles').some(item => item.id === titleId)) throw new Error('Title could not be found.');
+    const id = memberId + ':' + titleId;
+    const previous = read_(book, 'Reviews').find(item => item.id === id);
+    const now = new Date().toISOString();
+    save_(book, 'Reviews', {id, memberId, titleId, comment, stars,
+      createdAt: previous ? previous.createdAt : now, updatedAt: now}, previous && previous.row);
+    return state_(book);
+  });
 }

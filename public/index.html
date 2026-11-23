@@ -12,7 +12,7 @@
 <style>
 :root{--bg:#151318;--panel:#201c24;--line:#3a303d;--muted:#b8aab9;--pink:#FCA0D6;--white:#fff4f8}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--white);font:15px 'Lexend Deca',sans-serif;font-optical-sizing:auto}button,input,select,textarea{font:inherit;color:inherit}button,select{cursor:pointer}button,.button{border:1px solid var(--line);border-radius:9px;padding:10px 15px;background:var(--panel);text-decoration:none;color:inherit;font-weight:700}button:hover,.button:hover{border-color:var(--pink)}button:disabled{opacity:.55;cursor:wait}.primary{background:var(--pink);border-color:var(--pink);color:#26101c}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px max(5vw,18px);border-bottom:1px solid var(--line);background:#19151c;position:sticky;top:0;z-index:2;flex-wrap:wrap}nav,.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}nav button{background:transparent;border-color:transparent;color:var(--muted)}nav button[aria-current=page]{background:#352432;color:var(--pink)}header select{max-width:160px}
+header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px clamp(16px,3vw,64px);border-bottom:1px solid var(--line);background:#19151c;position:sticky;top:0;z-index:2;flex-wrap:wrap}nav,.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}nav button{background:transparent;border-color:transparent;color:var(--muted)}nav button[aria-current=page]{background:#352432;color:var(--pink)}header select{max-width:160px}
 main{width:min(1180px,90%);margin:28px auto 60px}.kicker{text-transform:uppercase;letter-spacing:.16em;font-size:11px;font-weight:700;color:var(--pink)}h2,h3,p{margin:0 0 12px}h2,h3{font-family:inherit;font-weight:650}h2{font-size:28px}h3{font-size:18px}p{line-height:1.5}.muted,small{color:var(--muted)}
 .toolbar{display:flex;gap:10px;margin:0 0 28px}.toolbar input{flex:1}.toolbar select{max-width:45%}input,select,textarea{min-width:0;background:#17141a;border:1px solid var(--line);border-radius:8px;padding:10px 12px}textarea{width:100%;resize:vertical}section{margin:0 0 30px}.rail{display:grid;grid-auto-columns:clamp(135px,19vw,190px);grid-auto-flow:column;gap:14px;overflow-x:auto;padding:10px 3px 14px;scroll-snap-type:x proximity}.tile{padding:0;border:0;background:none;text-align:left;scroll-snap-align:start;min-width:0}.tile:hover .art{box-shadow:0 0 0 2px var(--pink)}.tile strong,.tile small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:6px}.art{aspect-ratio:2/3;display:grid;place-items:center;position:relative;overflow:hidden;border-radius:12px;background:radial-gradient(ellipse at 30% 15%,hsl(var(--hue) 45% 38%),transparent 75%),#241d2a;border:1px solid #ffffff20;text-align:center;padding:12px}.art span{font:600 clamp(17px,2.5vw,25px) 'Lexend Deca',sans-serif;overflow-wrap:anywhere}.art img{position:absolute;width:100%;height:100%;inset:0;object-fit:cover}.empty{border:1px dashed var(--line);border-radius:15px;padding:30px;color:var(--muted);text-align:center}.empty h3{color:var(--white)}.demo{font-size:12px;color:var(--muted);text-align:center;margin:-10px 0 17px}
 dialog{background:var(--panel);color:var(--white);border:1px solid var(--line);border-radius:18px;width:min(650px,calc(100% - 24px));max-height:90vh;padding:22px}dialog::backdrop{background:#0c090ed0}.dialog-head{display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:15px}.close{padding:5px 11px;font-size:20px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}label,fieldset{display:grid;gap:6px;min-width:0;font-weight:600}.wide{grid-column:1/-1}fieldset{border:1px solid var(--line);border-radius:8px}.checks{display:flex;gap:10px;flex-wrap:wrap}.checks label{display:flex;align-items:center}.stars{display:flex;gap:4px}.stars button{font-size:24px;padding:2px 7px;color:var(--muted)}.stars button[aria-pressed=true]{color:#ffd378}.form-actions{margin-top:17px}.detail{display:grid;grid-template-columns:minmax(100px,180px) 1fr;gap:18px}.detail p{white-space:pre-wrap;overflow-wrap:anywhere}.detail .actions{margin-top:14px}.badge{padding:4px 8px;background:#392a3d;border-radius:6px;color:#f2c7df;display:inline-block;margin:0 4px 5px 0}.center{text-align:center}.deck{width:min(300px,85vw);margin:12px auto;touch-action:pan-y;user-select:none}.deck .art{aspect-ratio:4/5;cursor:grab}.deck img{pointer-events:none}.center .actions{justify-content:center}.list-row{border:1px solid var(--line);border-radius:11px;background:var(--panel);padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.list-row .title-link{background:none;border:0;text-align:left;padding:5px}.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.stat-card{padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}.bar{height:8px;border-radius:10px;background:#3b2f40;margin:4px 0 13px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pink)}#toast{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);background:#432b40;padding:10px 16px;border-radius:8px;z-index:10;width:max-content;max-width:92vw}#toast:empty{display:none}
@@ -64,7 +64,7 @@ nav .nav-icon[aria-current=page]{background:none;border-bottom-color:var(--pink)
 .primary{background:linear-gradient(125deg,#FCA0D6,var(--lavender));border:0;color:#28132b}
 input,select,textarea{background:#fff9fd;color:var(--white)}
 #memberButton{background:none;border:0}
-main{width:min(1320px,90%);margin-top:clamp(20px,4vw,50px)}
+main{width:calc(100% - 2 * clamp(16px,3vw,64px));margin-top:clamp(20px,4vw,50px)}
 .fresh-head{margin-bottom:12px}
 .fresh-head h2,#catalog h2{font-size:clamp(22px,2.8vw,36px);letter-spacing:-.04em}
 .fresh-rail{--feature-height:clamp(280px,40vw,520px);--preview-overlap:clamp(20px,4vw,56px);display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch}
@@ -125,6 +125,14 @@ main{width:min(1320px,90%);margin-top:clamp(20px,4vw,50px)}
 .fresh-arrows{display:flex;gap:5px}
 .fresh-arrows button{width:38px;height:34px;padding:0;border:0;background:none;color:var(--pink);opacity:.46;transition:opacity 180ms ease}
 .fresh-arrows button:hover,.fresh-arrows button:focus-visible{opacity:1}
+
+.reviews{margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}
+.reviews h3{margin:0 0 8px}.reviews h4{margin:0 0 4px;font-weight:600}
+#reviewForm{display:grid;gap:12px;margin:20px 0}#reviewForm select{width:max-content;max-width:100%}
+#reviewForm textarea{resize:vertical;min-height:90px}.review{padding:18px 0;border-top:1px solid var(--line)}
+.review-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.review-rating{color:#b52373;letter-spacing:2px}.review-rating small{letter-spacing:0}
+.review-date{font-size:12px;color:var(--muted);margin:5px 0 10px}.review-comment{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;line-height:1.6}
 </style>
 </head>
 <body>
@@ -180,7 +188,7 @@ const storage = {
   get(key) { try { return localStorage.getItem(key); } catch (_) { return null; } },
   set(key, value) { localStorage.setItem(key, value); }
 };
-const blank = () => ({members:[],titles:[],activity:[]});
+const blank = () => ({members:[],titles:[],activity:[],reviews:[]});
 let state = blank(), active = storage.get('watchclub-member') || '', view = 'browse';
 let query = '', typeFilter = '', picked = '', editing = '', stars = '', detailId = '';
 let toastTimer, busy = false, loaded = false;
@@ -189,6 +197,7 @@ let observer;
 
 function localCall(method, args) {
   const db = JSON.parse(storage.get('watchclub-demo') || JSON.stringify(blank()));
+  db.reviews ||= [];
   function status(memberId, titleId, value) {
     const id = memberId + ':' + titleId;
     db.activity = db.activity.filter(entry => entry.id !== id);
@@ -211,6 +220,14 @@ function localCall(method, args) {
     if (old) db.titles[db.titles.indexOf(old)] = title;
     else db.titles.push(title);
     completed.forEach(id => status(id,title.id,'watched'));
+  }
+  if (method === 'saveReview') {
+    const [memberId,titleId,comment,stars] = args;
+    const id = memberId + ':' + titleId, previous = db.reviews.find(r => r.id === id);
+    const now = new Date().toISOString();
+    const review = {id,memberId,titleId,comment:comment.trim(),stars:Number(stars),createdAt:previous?.createdAt || now,updatedAt:now};
+    db.reviews = db.reviews.filter(r => r.id !== id);
+    db.reviews.push(review);
   }
   if (method === 'setStatus') status(...args);
   storage.set('watchclub-demo',JSON.stringify(db));
@@ -742,6 +759,36 @@ function safeTrailer(value) {
   try { const url = new URL(value); return ['https:','http:'].includes(url.protocol) ? url.href : ''; }
   catch (_) { return ''; }
 }
+function reviewDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});
+}
+function reviewSection(id) {
+  const reviews = (state.reviews || []).filter(r => r.titleId === id).sort((a,b) => b.createdAt.localeCompare(a.createdAt));
+  const mine = reviews.find(r => r.memberId === active);
+  const average = reviews.length ? (reviews.reduce((sum,r) => sum + Number(r.stars),0) / reviews.length).toFixed(1) : '';
+  return '<section class="reviews" aria-label="Member reviews"><h3>Club reviews</h3>' +
+    '<p class="muted">' + (reviews.length ? average + ' / 5 · ' + reviews.length + (reviews.length === 1 ? ' review' : ' reviews') : 'No reviews yet. Start the conversation.') + '</p>' +
+    (active ? '<form id="reviewForm" data-title="' + esc(id) + '" data-member="' + esc(active) + '"><h4>' + (mine ? 'Edit your review' : 'Leave a review') + ' · ' + esc(memberName(active)) + '</h4><label>Your rating<select name="rating" required><option value="">Choose stars</option>' +
+      [1,2,3,4,5].map(n => '<option value="' + n + '"' + (Number(mine?.stars) === n ? ' selected' : '') + '>' + '★'.repeat(n) + ' · ' + n + '/5</option>').join('') + '</select></label><label>Your comment<textarea name="comment" rows="3" maxlength="3000" required placeholder="What did you think?">' + esc(mine?.comment || '') + '</textarea></label><div class="actions"><button class="primary">' + (mine ? 'Save changes' : 'Post review') + '</button></div><p class="form-error" role="alert"></p></form>' : '<p class="muted">Select your name in the browsing menu to leave a review.</p>') +
+    reviews.map(r => '<article class="review"><div class="review-meta"><strong>' + esc(memberName(r.memberId) || 'Member') + '</strong><span class="review-rating" aria-label="' + Number(r.stars) + ' out of 5 stars">' + '★'.repeat(Number(r.stars)) + ' <small>' + Number(r.stars) + '/5</small></span></div><p class="review-date">' + esc(reviewDate(r.createdAt)) + (r.updatedAt !== r.createdAt ? ' · Edited ' + esc(reviewDate(r.updatedAt)) : '') + '</p><p class="review-comment">' + esc(r.comment) + '</p></article>').join('') + '</section>';
+}
+async function saveReviewForm(event) {
+  event.preventDefault();
+  if (busy) return;
+  const form = event.currentTarget, fields = new FormData(form);
+  const comment = String(fields.get('comment') || '').trim(), rating = Number(fields.get('rating'));
+  const error = form.querySelector('.form-error'), button = form.querySelector('button');
+  error.textContent = '';
+  if (!comment || !Number.isInteger(rating) || rating < 1 || rating > 5) { error.textContent = 'Add a comment and choose 1–5 stars.'; return; }
+  busy = true; button.disabled = true;
+  try {
+    state = await call('saveReview',form.dataset.member,form.dataset.title,comment,rating);
+    showDetail(form.dataset.title);
+    toast('Review saved');
+  } catch (err) { error.textContent = err.message || 'Unable to save your review.'; }
+  finally { busy = false; button.disabled = false; }
+}
 function showDetail(id) {
   const t = state.titles.find(title => title.id === id);
   if (!t) return;
@@ -761,7 +808,8 @@ function showDetail(id) {
     (trailer ? '<a class="button" href="' + esc(trailer) + '" target="_blank" rel="noopener noreferrer">Trailer ↗</a>' : '') +
     (active && status !== 'watched' ? action(status === 'queued' ? 'Remove from To Watch' : '+ To Watch','change',id + ':' + (status === 'queued' ? '' : 'queued')) + action('✓ Watched','change',id + ':watched',true) : '') +
     (active && status === 'watched' ? action('Undo watched','change',id + ':') : '') +
-    action('Edit','edit',id) + '</div></div></div>';
+    action('Edit','edit',id) + '</div></div></div>' + reviewSection(id);
+  $('reviewForm')?.addEventListener('submit', saveReviewForm);
   if (!$('detailDialog').open) $('detailDialog').showModal();
   attachPosters($('detailBody'));
 }
