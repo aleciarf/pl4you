@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-scene="aurora">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -220,6 +220,50 @@ section[aria-labelledby="fresh-heading"]{max-width:none;width:100%}
 @media(prefers-reduced-motion:reduce){.fresh-panel[aria-pressed=true] img{animation:none;translate:none}}
 
 .trio .art{display:block;width:100%;padding:0;aspect-ratio:2/3;border-radius:6px}.demo-picker .art{width:100%;aspect-ratio:2/3}.trio .art img,.demo-picker .art img{position:absolute;inset:0;width:100%;height:100%;margin:0}.trio button{color:inherit}.demo-picker label[hidden]{display:none!important}
+/* Five-second cinematic sequence: reveal, settle, hold. */
+.fresh-panel[aria-pressed=true]{animation:cinema-scene 1100ms cubic-bezier(.2,.7,.2,1) both}
+.fresh-panel[aria-pressed=true] img{animation:cinema-lens 5s cubic-bezier(.2,.4,.35,1) both;transform-origin:65% 45%;will-change:transform,translate,opacity;}
+.fresh-panel[aria-pressed=true] .fresh-details{perspective:1000px}
+.fresh-title{overflow:visible;line-height:1.13}
+.cinema-word{display:inline-block}
+.fresh-panel[aria-pressed=true] .cinema-word{animation:cinema-title 900ms cubic-bezier(.16,1,.3,1) both;animation-delay:calc(200ms + var(--word) * 100ms)}
+.fresh-panel[aria-pressed=true] .fresh-meta{animation:cinema-copy 750ms ease both;animation-delay:150ms}
+.fresh-panel[aria-pressed=true] .fresh-score{animation:cinema-copy 850ms ease both;animation-delay:450ms}
+.fresh-panel[aria-pressed=true] .fresh-summary{animation:cinema-copy 850ms ease both;animation-delay:600ms}
+.fresh-panel[aria-pressed=true] .fresh-meta.muted{animation-delay:760ms}
+.fresh-panel[aria-pressed=true] .fresh-link{animation:cinema-copy 700ms ease both;animation-delay:900ms}
+.fresh-panel[aria-pressed=true]::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(115deg,transparent 30%,#fff6 48%,transparent 65%);mix-blend-mode:soft-light;animation:cinema-light 2200ms ease both}
+.fresh-panel[aria-pressed=true]::before{animation:cinema-halo 5s ease both}
+.fresh-dot{position:relative}.fresh-dot[aria-current=true]::after{content:'';position:absolute;bottom:0;left:6px;right:6px;height:2px;border-radius:4px;background:var(--pink);transform-origin:left;animation:cinema-progress 5s linear both}
+@keyframes cinema-scene{from{opacity:.3}to{opacity:1}}
+@keyframes cinema-lens{0%{translate:-50px 0;transform:scale(1.07);opacity:.4;filter:blur(4px) saturate(.8)}22%{opacity:1;filter:blur(0) saturate(1)}100%{translate:0 0;transform:scale(1.13);opacity:1;filter:blur(0) saturate(1.05)}}
+@keyframes cinema-title{from{opacity:0;transform:translateY(30px) rotateX(24deg);filter:blur(10px);clip-path:inset(100% 0 0)}to{opacity:1;transform:none;filter:blur(0);clip-path:inset(0)}}
+@keyframes cinema-copy{from{opacity:0;transform:translateY(13px);filter:blur(4px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes cinema-light{from{opacity:0;transform:translateX(-60%)}25%{opacity:.65}to{opacity:0;transform:translateX(75%)}}
+@keyframes cinema-halo{from{transform:translateY(-50%) scale(.95);opacity:.08}to{transform:translateY(-50%) scale(1.12);opacity:.22}}
+@keyframes cinema-progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){.fresh-panel[aria-pressed=true],.fresh-panel[aria-pressed=true] img,.fresh-panel[aria-pressed=true] .fresh-details>*,.fresh-panel[aria-pressed=true] .cinema-word,.fresh-panel[aria-pressed=true]::before,.fresh-panel[aria-pressed=true]::after,.fresh-dot[aria-current=true]::after{animation:none;transform:none;translate:none;filter:none}}
+
+/* Center stage, next on left / previous on right. Overall width stays unchanged. */
+.fresh-rail{grid-template-columns:minmax(0,12fr) minmax(0,76fr) minmax(0,12fr);isolation:isolate}
+.fresh-panel[aria-pressed=true]{grid-column:2;grid-row:1}
+.fresh-panel[data-next],.fresh-panel[data-previous]{display:block;position:relative;grid-row:1;align-self:center;aspect-ratio:2/3;width:100%;height:auto;min-height:0;max-height:none;max-width:none;margin:0;overflow:hidden;z-index:0;background:#edc0db;animation:none;border:0;border-radius:0}
+.fresh-panel[data-next]{grid-column:1;transform:translateX(18px) scale(.93)}
+.fresh-panel[data-previous]{grid-column:3;transform:translateX(-18px) scale(.93)}
+.fresh-panel[data-next] img,.fresh-panel[data-previous] img{display:block;position:static;width:100%;height:100%;object-fit:cover;opacity:.38;filter:blur(7px) saturate(.7);transform:scale(1.09);mask-image:none;-webkit-mask-image:none;animation:none}
+.fresh-panel[data-next]::after,.fresh-panel[data-previous]::after{content:'';position:absolute;inset:0;pointer-events:none}
+.fresh-panel[data-next]::after{background:linear-gradient(270deg,#33112e65,transparent 80%)}
+.fresh-panel[data-previous]::after{background:linear-gradient(90deg,#33112e65,transparent 80%)}
+.fresh-panel[data-next] .fresh-details,.fresh-panel[data-previous] .fresh-details{display:none}
+.fresh-panel[aria-pressed=true] .fresh-details{width:58%;padding:clamp(24px,3vw,50px)}
+.fresh-panel[aria-pressed=true] .fresh-title{font-size:clamp(38px,4.5vw,72px)}
+/* 1 — Aurora: broad clouds of pink and lavender. */
+html[data-scene=aurora] .fresh-panel[aria-pressed=true]{background:linear-gradient(110deg,#ffe6f3,#fca0d6,#ded0f4,#ffc3e6);background-size:240% 240%;animation:background-flow 10s ease-in-out infinite alternate,cinema-scene 1.1s ease both}
+html[data-scene=aurora] .fresh-panel[aria-pressed=true]::before{inset:-30%;width:160%;aspect-ratio:auto;border-radius:0;transform:none;background:radial-gradient(ellipse at 65% 30%,#ffffff70,transparent 50%);animation:cloud-float 14s ease-in-out infinite alternate;opacity:.5}
+@keyframes background-flow{from{background-position:0% 30%}to{background-position:100% 80%}}
+@keyframes cloud-float{from{translate:-3% 0}to{translate:3% 3%}}
+@media(max-width:640px){.fresh-rail{grid-template-columns:minmax(0,7fr) minmax(0,86fr) minmax(0,7fr)}.fresh-panel[data-next],.fresh-panel[data-previous]{margin:0;align-self:center;width:100%}.fresh-panel[data-next]{transform:translateX(5px)}.fresh-panel[data-previous]{transform:translateX(-5px)}.fresh-panel[aria-pressed=true] .fresh-details{width:100%;padding:310px 20px 22px}}
+@media(prefers-reduced-motion:reduce){html[data-scene] .fresh-panel[aria-pressed=true],html[data-scene] .fresh-panel[aria-pressed=true]::before{animation:none}}
 </style>
 </head>
 <body>
@@ -459,14 +503,22 @@ function renderFreshPanel(title) {
     '" aria-label="' + esc(title.name) + '"><img data-poster="' + esc(title.id) + '" alt="">' +
     '<span class="fresh-details">' +
     (genres ? '<span class="fresh-meta">' + esc(genres) + '</span>' : '') +
-    '<strong class="fresh-title">' + esc(title.name) + '</strong>' + rating +
+    '<strong class="fresh-title">' + title.name.split(/\s+/).map((word,i) => '<span class="cinema-word" style="--word:'+i+'">'+esc(word)+'</span>').join(' ') + '</strong>' + rating +
     (title.summary ? '<span class="fresh-summary muted">' + esc(title.summary) + '</span>' : '') +
     (recommender ? '<span class="fresh-meta muted">Suggested by ' + esc(recommender) + '</span>' : '') +
     '<span class="fresh-link">View details <span aria-hidden="true">↗</span></span></span></button>';
 }
 
-function animateFreshUnfold(rail,incoming,outgoing) {
- if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) incoming.animate([{opacity:0},{opacity:1}],{duration:900,easing:'ease-in-out'});
+function animateFreshUnfold(rail,incoming,outgoing,oldRect,start,direction) {
+ const bounds=rail.getBoundingClientRect();
+ const layer=document.createElement('div');layer.className='fresh-unfold-layer';
+ layer.setAttribute('aria-hidden','true');layer.style.overflow='hidden';
+ Object.assign(outgoing.style,{position:'absolute',left:(oldRect.left-bounds.left)+'px',top:(oldRect.top-bounds.top)+'px',width:oldRect.width+'px',height:oldRect.height+'px',minHeight:'0',pointerEvents:'none',animation:'none'});
+ outgoing.removeAttribute('data-next');outgoing.tabIndex=-1;
+ outgoing.querySelectorAll('[data-poster]').forEach(el=>el.removeAttribute('data-poster'));
+ layer.append(outgoing);rail.append(layer);
+ const exit=outgoing.animate([{opacity:1,transform:'none',filter:'blur(0px)'},{opacity:0,transform:'translateX('+(-24*direction)+'px) scale(1.025)',filter:'blur(9px)'}],{duration:850,easing:'cubic-bezier(.2,.65,.25,1)',fill:'forwards'});
+ exit.finished.catch(()=>{}).finally(()=>layer.remove());
 }
 
 function wireFreshPicks() {
@@ -499,6 +551,7 @@ function wireFreshPicks() {
     panels.forEach((panel,i) => {
       panel.setAttribute('aria-pressed',String(i === index));
       panel.toggleAttribute('data-next',i === upcoming);
+      panel.toggleAttribute('data-previous',panels.length > 2 && i === (index - 1 + panels.length) % panels.length);
       dots[i].setAttribute('aria-current',String(i === index));
     });
     freshTitleId = panels[index].firstElementChild.dataset.poster;

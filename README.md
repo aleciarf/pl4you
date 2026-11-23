@@ -65,3 +65,7 @@ Fresh Picks has a 1160px maximum width (edit --fresh-max-width), larger text, an
 ## Feathered carousel and member profiles
 The full-width carousel blends poster edges into pink and drifts 50px in 16 seconds per direction (1.5× the preview speed). Automatic carousel rotation remains every 5 seconds. Reduced-motion preferences disable drift. Stats show each member's optional 160-character status and up to three chosen titles. Select a member, open Stats, and choose Edit my profile.
 Deploy public/index.html and worker.mjs together. Replace google/Code.gs and deploy a new version of the existing Apps Script web app. Profiles are saved on existing Members rows; no setup rerun or new secret is needed.
+
+
+## Aurora cinematic carousel
+The selected Aurora background is now the production design: moving pink/lavender clouds, feathered poster with cinematic zoom and drift, staggered text reveals, and a soft outgoing dissolve. The current panel is centered, next preview left and previous preview right, with matching blur and fade. Rotation remains 5 seconds per title. Preview-only background controls are omitted. This visual update requires only public/index.html if the previous member-profile backend is already deployed.
