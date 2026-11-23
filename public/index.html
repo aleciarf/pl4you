@@ -264,6 +264,12 @@ html[data-scene=aurora] .fresh-panel[aria-pressed=true]::before{inset:-30%;width
 @keyframes cloud-float{from{translate:-3% 0}to{translate:3% 3%}}
 @media(max-width:640px){.fresh-rail{grid-template-columns:minmax(0,7fr) minmax(0,86fr) minmax(0,7fr)}.fresh-panel[data-next],.fresh-panel[data-previous]{margin:0;align-self:center;width:100%}.fresh-panel[data-next]{transform:translateX(5px)}.fresh-panel[data-previous]{transform:translateX(-5px)}.fresh-panel[aria-pressed=true] .fresh-details{width:100%;padding:310px 20px 22px}}
 @media(prefers-reduced-motion:reduce){html[data-scene] .fresh-panel[aria-pressed=true],html[data-scene] .fresh-panel[aria-pressed=true]::before{animation:none}}
+
+/* Static poster with animated typography and Aurora backdrop. */
+.fresh-rail{grid-template-columns:minmax(0,12fr) minmax(0,88fr)}
+.fresh-panel[aria-pressed=true] img{animation:none!important;translate:none!important;transform:none!important;filter:saturate(.92);opacity:1;will-change:auto}
+.fresh-panel[data-previous]{display:none!important}
+@media(max-width:640px){.fresh-rail{grid-template-columns:minmax(0,7fr) minmax(0,93fr)}}
 </style>
 </head>
 <body>
@@ -551,7 +557,7 @@ function wireFreshPicks() {
     panels.forEach((panel,i) => {
       panel.setAttribute('aria-pressed',String(i === index));
       panel.toggleAttribute('data-next',i === upcoming);
-      panel.toggleAttribute('data-previous',panels.length > 2 && i === (index - 1 + panels.length) % panels.length);
+
       dots[i].setAttribute('aria-current',String(i === index));
     });
     freshTitleId = panels[index].firstElementChild.dataset.poster;
