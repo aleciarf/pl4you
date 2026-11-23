@@ -270,6 +270,15 @@ html[data-scene=aurora] .fresh-panel[aria-pressed=true]::before{inset:-30%;width
 .fresh-panel[aria-pressed=true] img{animation:none!important;translate:none!important;transform:none!important;filter:saturate(.92);opacity:1;will-change:auto}
 .fresh-panel[data-previous]{display:none!important}
 @media(max-width:640px){.fresh-rail{grid-template-columns:minmax(0,7fr) minmax(0,93fr)}}
+
+/* Selected style: Cinematic crop, static artwork, next preview on the right. */
+.fresh-rail{grid-template-columns:minmax(0,88fr) minmax(0,12fr)}
+.fresh-panel[aria-pressed=true]{grid-column:1}
+.fresh-panel[data-next]{grid-column:2;transform:translateX(-18px) scale(.93)}
+.fresh-panel[data-next]::after{background:linear-gradient(90deg,#33112e65,transparent 80%)}
+.fresh-panel[data-previous]{display:none!important}
+.fresh-panel[aria-pressed=true] img{position:absolute;inset:0 0 0 auto;width:46%;max-width:46%;height:100%;object-fit:cover;object-position:center;mask-image:none!important;-webkit-mask-image:none!important;animation:none!important;translate:none!important;transform:none!important;filter:none!important;opacity:1;border:0;border-radius:0;box-shadow:none;will-change:auto}
+@media(max-width:640px){.fresh-rail{grid-template-columns:minmax(0,93fr) minmax(0,7fr)}.fresh-panel[data-next]{grid-column:2;transform:translateX(-5px)}.fresh-panel[aria-pressed=true] img{width:100%;max-width:100%;height:300px;top:0;right:0;object-position:center 40%}.fresh-panel[aria-pressed=true] .fresh-details{width:100%;padding:320px 22px 22px}}
 </style>
 </head>
 <body>
@@ -512,7 +521,7 @@ function renderFreshPanel(title) {
     '<strong class="fresh-title">' + title.name.split(/\s+/).map((word,i) => '<span class="cinema-word" style="--word:'+i+'">'+esc(word)+'</span>').join(' ') + '</strong>' + rating +
     (title.summary ? '<span class="fresh-summary muted">' + esc(title.summary) + '</span>' : '') +
     (recommender ? '<span class="fresh-meta muted">Suggested by ' + esc(recommender) + '</span>' : '') +
-    '<span class="fresh-link">View details <span aria-hidden="true">↗</span></span></span></button>';
+    '<span class="fresh-link">View Mix <span aria-hidden="true">↗</span></span></span></button>';
 }
 
 function animateFreshUnfold(rail,incoming,outgoing,oldRect,start,direction) {
